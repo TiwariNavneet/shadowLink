@@ -3,6 +3,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
 const fs = require('fs');
+const webpush = require('web-push');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,18 +12,32 @@ const io = new Server(server);
 const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'db.json');
 
-// Initialize database file for PINs persistence
-let dbData = { pins: {} };
+// Initialize database file for PINs and Push Subscriptions persistence
+let dbData = { pins: {}, subscriptions: {} };
 if (fs.existsSync(DB_FILE)) {
   try {
     dbData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     if (!dbData.pins) dbData.pins = {};
+    if (!dbData.subscriptions) dbData.subscriptions = {};
   } catch (e) {
     console.error("Error reading db.json, resetting...", e);
   }
 } else {
   fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
 }
+
+// Generate VAPID keys dynamically if not exists
+if (!dbData.vapidKeys) {
+  dbData.vapidKeys = webpush.generateVAPIDKeys();
+  fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
+}
+
+// Configure web-push details
+webpush.setVapidDetails(
+  'mailto:admin@shadowlink.local',
+  dbData.vapidKeys.publicKey,
+  dbData.vapidKeys.privateKey
+);
 
 // Predefined 9 secret codename users mapped to real names
 const users = [
@@ -47,7 +62,7 @@ const userSockets = new Map();
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 
-// REST endpoints for fetching users list with PIN status
+// Fetch users list
 app.get('/api/users', (req, res) => {
   const usersWithPinStatus = users.map(u => ({
     ...u,
@@ -87,6 +102,22 @@ app.post('/api/set-pin', (req, res) => {
   return res.json({ status: 'SUCCESS' });
 });
 
+// Get VAPID Public Key
+app.get('/api/vapid-public-key', (req, res) => {
+  res.json({ publicKey: dbData.vapidKeys.publicKey });
+});
+
+// Save Web Push Subscription for a user
+app.post('/api/subscribe', (req, res) => {
+  const { userId, subscription } = req.body;
+  if (!users.some(u => u.id === userId)) {
+    return res.status(400).json({ error: 'Invalid user ID' });
+  }
+  dbData.subscriptions[userId] = subscription;
+  fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
+  res.json({ success: true });
+});
+
 // Socket.io connection handling
 io.on('connection', (socket) => {
   let currentUserId = null;
@@ -96,7 +127,7 @@ io.on('connection', (socket) => {
       socket.emit('error-msg', 'Invalid User ID');
       return;
     }
-
+    
     currentUserId = userId;
     if (!userSockets.has(userId)) {
       userSockets.set(userId, new Set());
@@ -114,7 +145,7 @@ io.on('connection', (socket) => {
         }
         return msg;
       });
-
+    
     socket.emit('message-history', userMessages);
   });
 
@@ -141,12 +172,37 @@ io.on('connection', (socket) => {
 
     messages.push(newMessage);
 
-    // Send to recipient
+    // Send to recipient via WebSocket if online
     const recipientSockets = userSockets.get(to);
-    if (recipientSockets) {
+    let recipientOnline = false;
+    if (recipientSockets && recipientSockets.size > 0) {
+      recipientOnline = true;
       recipientSockets.forEach(sid => {
         io.to(sid).emit('new-message', newMessage);
       });
+    }
+
+    // Trigger Web Push Notification if recipient is not online/connected
+    if (!recipientOnline) {
+      const subscription = dbData.subscriptions[to];
+      if (subscription) {
+        const sender = users.find(u => u.id === currentUserId);
+        const payload = JSON.stringify({
+          title: `New Snap from ${sender ? sender.name : 'Someone'}`,
+          body: 'You received a new disappearing snap!',
+          tag: newMessage.id,
+          senderId: currentUserId
+        });
+
+        webpush.sendNotification(subscription, payload).catch(err => {
+          console.error('Error sending push notification to ' + to, err.message);
+          // If subscription has expired or is no longer valid, delete it
+          if (err.statusCode === 410 || err.statusCode === 404) {
+            delete dbData.subscriptions[to];
+            fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
+          }
+        });
+      }
     }
 
     // Send confirmation to sender
@@ -186,7 +242,7 @@ io.on('connection', (socket) => {
     setTimeout(() => {
       msg.status = 'destroyed';
       msg.text = '• Message self-destructed •';
-
+      
       notifyUsers.forEach(uId => {
         const sids = userSockets.get(uId);
         if (sids) {

@@ -31,19 +31,37 @@ self.addEventListener('fetch', (e) => {
   );
 });
 
+// Handle push event (triggers mobile background push notifications)
+self.addEventListener('push', (e) => {
+  try {
+    const data = e.data.json();
+    const options = {
+      body: data.body,
+      icon: 'https://img.icons8.com/color/192/000000/ghost.png',
+      badge: 'https://img.icons8.com/color/96/000000/ghost.png',
+      tag: data.tag,
+      vibrate: [100, 50, 100],
+      data: { senderId: data.senderId }
+    };
+    e.waitUntil(
+      self.registration.showNotification(data.title, options)
+    );
+  } catch (err) {
+    console.error('Error receiving push event:', err);
+  }
+});
+
 // Handle notification click on mobile devices
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   
   e.waitUntil(
     clients.matchAll({ type: 'window' }).then((clientList) => {
-      // Find open window and focus it
       for (const client of clientList) {
         if (client.url.includes(self.location.origin) && 'focus' in client) {
           return client.focus();
         }
       }
-      // If no window open, open a new one
       if (clients.openWindow) {
         return clients.openWindow('/');
       }

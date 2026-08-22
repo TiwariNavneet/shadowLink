@@ -730,13 +730,56 @@ if (!isOfflineMode && socket) {
   });
 }
 
-// Native HTML5 Web Notification handlers for PWA
-function requestNotificationPermission() {
-  if ('Notification' in window) {
-    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
-      Notification.requestPermission();
+// Native HTML5 Web Notification & Web Push handlers for PWA
+async function requestNotificationPermission() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted' && !isOfflineMode) {
+      const reg = await navigator.serviceWorker.ready;
+      
+      // Get existing subscription
+      let subscription = await reg.pushManager.getSubscription();
+      
+      if (!subscription) {
+        // Fetch VAPID public key from backend
+        const keyRes = await fetch('/api/vapid-public-key');
+        const { publicKey } = await keyRes.json();
+
+        subscription = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(publicKey)
+        });
+      }
+
+      // Send subscription object to server database
+      await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: currentUser.id, subscription })
+      });
+      console.log('Web Push subscription completed successfully.');
     }
+  } catch (err) {
+    console.warn('Web Push registration failed:', err.message);
   }
+}
+
+// Helper to convert base64 VAPID keys to Uint8Array
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
 }
 
 function showLocalNotification(msg) {
