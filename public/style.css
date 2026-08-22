@@ -153,29 +153,35 @@ body {
 
 .users-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 25px;
 }
 
-.user-select-card {
+.user-select-name-btn {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  border-radius: 16px;
-  padding: 20px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 16px 20px;
+  border-radius: 14px;
   cursor: pointer;
   transition: var(--transition-smooth);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   text-align: center;
 }
 
-.user-select-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+.user-select-name-btn:hover {
+  background: rgba(255, 252, 0, 0.08);
+  border-color: rgba(255, 252, 0, 0.25);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -5px rgba(255, 252, 0, 0.15);
+}
+
+.user-select-name-btn:active {
+  transform: translateY(0);
 }
 
 .avatar {

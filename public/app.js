@@ -217,20 +217,15 @@ function requestPinLogin(user) {
   }
 }
 
-// Render the secret codename cards in login screen (real names hidden)
+// Render the secret codename list in login screen
 function renderUsersGrid() {
   usersGrid.innerHTML = '';
   usersList.forEach(user => {
-    const card = document.createElement('div');
-    card.className = 'user-select-card';
-    card.innerHTML = `
-      <div class="avatar" style="background: ${user.avatarColor}">
-        ${getInitials(user.name)}
-      </div>
-      <h4>${user.name}</h4>
-    `;
-    card.addEventListener('click', () => requestPinLogin(user));
-    usersGrid.appendChild(card);
+    const btn = document.createElement('button');
+    btn.className = 'user-select-name-btn';
+    btn.textContent = user.name;
+    btn.addEventListener('click', () => requestPinLogin(user));
+    usersGrid.appendChild(btn);
   });
 }
 
