@@ -796,6 +796,11 @@ function showLocalNotification(msg) {
         tag: msg.id,
         badge: "https://img.icons8.com/color/96/000000/ghost.png",
         vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 200], // Wake-up vibration pattern
+        requireInteraction: true, // Keep notification active to wake screen
+        renotify: true, // Force sound/vibe on new messages
+        actions: [
+          { action: 'open', title: 'Open Chat' }
+        ],
         data: { senderId: msg.from }
       };
 
