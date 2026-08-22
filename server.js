@@ -199,27 +199,24 @@ io.on('connection', (socket) => {
       });
     }
 
-    // Trigger Web Push Notification if recipient is not online/connected
-    if (!recipientOnline) {
-      const subscription = dbData.subscriptions[to];
-      if (subscription) {
-        const sender = users.find(u => u.id === currentUserId);
-        const payload = JSON.stringify({
-          title: `New Snap from ${sender ? sender.name : 'Someone'}`,
-          body: 'You received a new disappearing snap!',
-          tag: newMessage.id,
-          senderId: currentUserId
-        });
+    // Always dispatch Web Push Notification if a subscription exists for the recipient
+    const subscription = dbData.subscriptions[to];
+    if (subscription) {
+      const sender = users.find(u => u.id === currentUserId);
+      const payload = JSON.stringify({
+        title: `New Snap from ${sender ? sender.name : 'Someone'}`,
+        body: 'You received a new disappearing snap!',
+        tag: newMessage.id,
+        senderId: currentUserId
+      });
 
-        webpush.sendNotification(subscription, payload).catch(err => {
-          console.error('Error sending push notification to ' + to, err.message);
-          // If subscription has expired or is no longer valid, delete it
-          if (err.statusCode === 410 || err.statusCode === 404) {
-            delete dbData.subscriptions[to];
-            fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
-          }
-        });
-      }
+      webpush.sendNotification(subscription, payload).catch(err => {
+        console.error('Error sending push notification to ' + to, err.message);
+        if (err.statusCode === 410 || err.statusCode === 404) {
+          delete dbData.subscriptions[to];
+          fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
+        }
+      });
     }
 
     // Send confirmation to sender

@@ -34,17 +34,31 @@ self.addEventListener('fetch', (e) => {
 // Handle push event (triggers mobile background push notifications)
 self.addEventListener('push', (e) => {
   try {
-    const data = e.data.json();
+    let data = {};
+    if (e.data) {
+      try {
+        data = e.data.json();
+      } catch (err) {
+        data = { title: "New Snap", body: e.data.text() };
+      }
+    }
     const options = {
-      body: data.body,
+      body: data.body || "You received a new disappearing snap!",
       icon: 'https://img.icons8.com/color/192/000000/ghost.png',
       badge: 'https://img.icons8.com/color/96/000000/ghost.png',
-      tag: data.tag,
+      tag: data.tag || 'new-snap',
       vibrate: [100, 50, 100],
       data: { senderId: data.senderId }
     };
+    
     e.waitUntil(
-      self.registration.showNotification(data.title, options)
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+        // If the app is currently open and focused in the foreground, do not show duplicate push banner
+        const isAppActive = clientList.some(client => client.focused || client.visibilityState === 'visible');
+        if (!isAppActive) {
+          return self.registration.showNotification(data.title || "ShadowLink Alert", options);
+        }
+      })
     );
   } catch (err) {
     console.error('Error receiving push event:', err);
