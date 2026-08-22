@@ -28,7 +28,7 @@ The system operates strictly on a mapped list of 9 profiles. The mappings are st
 | u1 | **Raven** | Deepak Nautiyal | `linear-gradient(135deg, #FF6B6B, #FF8E53)` |
 | u2 | **Cipher** | Ayush Sharma | `linear-gradient(135deg, #F3A683, #F19066)` |
 | u3 | **Falcon** | Vipul Tiwari | `linear-gradient(135deg, #4834D4, #686DE0)` |
-| u4 | **Orion** | Chandra Prakash Maurya | `linear-gradient(135deg, #1DD1A1, #10AC84)` |
+| u4 | **Orion** | Sanjay Upadhaye | `linear-gradient(135deg, #1DD1A1, #10AC84)` |
 | u5 | **Shadow** | Navneet Tiwari | `linear-gradient(135deg, #FF9F43, #FFB142)` |
 | u6 | **Viper** | Amit Chahar | `linear-gradient(135deg, #0984E3, #74B9FF)` |
 | u7 | **Phoenix** | Tattvam Shiva Chaturvedi | `linear-gradient(135deg, #2C3E50, #34495E)` |
