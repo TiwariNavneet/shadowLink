@@ -30,3 +30,23 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+
+// Handle notification click on mobile devices
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  
+  e.waitUntil(
+    clients.matchAll({ type: 'window' }).then((clientList) => {
+      // Find open window and focus it
+      for (const client of clientList) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // If no window open, open a new one
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
+  );
+});

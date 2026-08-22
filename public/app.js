@@ -741,24 +741,31 @@ function requestNotificationPermission() {
 
 function showLocalNotification(msg) {
   if ('Notification' in window && Notification.permission === 'granted') {
-    // Only send notification if document is hidden OR sender is not the currently active chat
     if (msg.from !== currentUser.id && (document.hidden || msg.from !== activeRecipientId)) {
       const sender = usersList.find(u => u.id === msg.from);
       const senderName = sender ? sender.name : "Someone";
       
-      const notification = new Notification(`New message from ${senderName}`, {
+      const options = {
         body: "You received a new disappearing snap!",
         icon: "https://img.icons8.com/color/192/000000/ghost.png",
-        tag: msg.id
-      });
-
-      notification.onclick = () => {
-        window.focus();
-        if (sender) {
-          selectRecipient(sender);
-        }
-        notification.close();
+        tag: msg.id,
+        badge: "https://img.icons8.com/color/96/000000/ghost.png",
+        vibrate: [100, 50, 100],
+        data: { senderId: msg.from }
       };
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.showNotification(`New message from ${senderName}`, options);
+        });
+      } else {
+        const notification = new Notification(`New message from ${senderName}`, options);
+        notification.onclick = () => {
+          window.focus();
+          if (sender) selectRecipient(sender);
+          notification.close();
+        };
+      }
     }
   }
 }
