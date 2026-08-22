@@ -786,6 +786,14 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 0.2s ease;
+}
+
+.snap-content-body:active {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 #snap-text-content {
@@ -794,6 +802,9 @@ body {
   line-height: 1.5;
   color: #fff;
   word-break: break-word;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: filter 0.2s ease;
 }
 
 .snap-viewer-footer {

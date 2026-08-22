@@ -44,6 +44,7 @@ let currentUser = null;
 let activeRecipientId = null;
 let messageHistory = [];
 let activeCountdownInterval = null;
+let activeMessageBeingViewed = null; // Track message currently in viewer modal
 
 // DOM Elements
 const loginScreen = document.getElementById('login-screen');
@@ -509,7 +510,8 @@ function showSnapViewer(msg) {
   viewerAvatar.style.background = sender ? sender.avatarColor : '#ccc';
   viewerAvatar.textContent = sender ? getInitials(sender.name) : '??';
   
-  snapTextContent.textContent = msg.text;
+  activeMessageBeingViewed = msg;
+  snapTextContent.textContent = "👆 Press and HOLD here to read the message";
   snapViewerOverlay.classList.add('active');
 
   const duration = msg.openTimer;
@@ -540,11 +542,43 @@ function showSnapViewer(msg) {
 
 function closeSnapViewer() {
   snapViewerOverlay.classList.remove('active');
+  activeMessageBeingViewed = null;
+  snapTextContent.textContent = "Loading message...";
   if (activeCountdownInterval) {
     clearInterval(activeCountdownInterval);
     activeCountdownInterval = null;
   }
 }
+
+// Hold-To-View Interaction (Prevents screenshots by hiding/clearing text dynamically when finger is lifted or focus is lost)
+const snapContentBody = document.querySelector('.snap-content-body');
+
+const revealMessage = () => {
+  if (activeMessageBeingViewed) {
+    snapTextContent.textContent = activeMessageBeingViewed.text;
+    snapTextContent.style.filter = 'none';
+  }
+};
+
+const hideMessage = () => {
+  if (activeMessageBeingViewed) {
+    snapTextContent.textContent = "👆 Press and HOLD here to read the message";
+    snapTextContent.style.filter = 'blur(4px)';
+  }
+};
+
+// Bind press events to the large content box
+snapContentBody.addEventListener('mousedown', revealMessage);
+snapContentBody.addEventListener('touchstart', (e) => {
+  e.preventDefault(); // Stop default browser triggers (menus/zooms)
+  revealMessage();
+});
+
+// Bind release events
+snapContentBody.addEventListener('mouseup', hideMessage);
+snapContentBody.addEventListener('mouseleave', hideMessage);
+snapContentBody.addEventListener('touchend', hideMessage);
+snapContentBody.addEventListener('touchcancel', hideMessage);
 
 // Character counter and input validation
 messageInput.addEventListener('input', () => {
