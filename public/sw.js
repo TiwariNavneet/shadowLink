@@ -47,7 +47,7 @@ self.addEventListener('push', (e) => {
       icon: 'https://img.icons8.com/color/192/000000/ghost.png',
       badge: 'https://img.icons8.com/color/96/000000/ghost.png',
       tag: data.tag || 'new-message',
-      vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 200], // Wake-up vibration pattern
+      vibrate: [1000, 200, 1000, 200, 1000], // Heavy vibration pattern (1s vibration, 0.2s pause)
       sound: 'default', // Trigger default device sound to wake screen
       requireInteraction: true, // Keep notification active to wake screen
       renotify: true, // Force sound/vibe on new messages
