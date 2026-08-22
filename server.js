@@ -7,10 +7,15 @@ const webpush = require('web-push');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
-
 const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'db.json');
+
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 // Initialize database file for PINs and Push Subscriptions persistence
 let dbData = { pins: {}, subscriptions: {} };
@@ -57,6 +62,18 @@ let messages = [];
 
 // Map to track active user socket connections
 const userSockets = new Map();
+
+// Enable CORS middleware manually
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 // Serve static assets from public folder
 app.use(express.static(path.join(__dirname, 'public')));

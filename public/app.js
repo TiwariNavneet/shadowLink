@@ -144,7 +144,7 @@ async function fetchUsers() {
   }
 
   try {
-    const res = await fetch('/api/users');
+    const res = await fetch(BACKEND_URL + '/api/users');
     if (!res.ok) throw new Error("HTTP error " + res.status);
     usersList = await res.json();
   } catch (err) {
@@ -241,7 +241,7 @@ loginForm.addEventListener('submit', async (e) => {
   } else {
     // Online verification
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch(BACKEND_URL + '/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: user.id, pin: enteredPin })
@@ -251,7 +251,7 @@ loginForm.addEventListener('submit', async (e) => {
       if (data.status === 'NO_PIN') {
         const confirmSetup = confirm(`Secure this profile (${user.name}) with the entered PIN?`);
         if (confirmSetup) {
-          const setRes = await fetch('/api/set-pin', {
+          const setRes = await fetch(BACKEND_URL + '/api/set-pin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId: user.id, pin: enteredPin })
@@ -744,7 +744,7 @@ async function requestNotificationPermission() {
       
       if (!subscription) {
         // Fetch VAPID public key from backend
-        const keyRes = await fetch('/api/vapid-public-key');
+        const keyRes = await fetch(BACKEND_URL + '/api/vapid-public-key');
         const { publicKey } = await keyRes.json();
 
         subscription = await reg.pushManager.subscribe({
@@ -754,7 +754,7 @@ async function requestNotificationPermission() {
       }
 
       // Send subscription object to server database
-      await fetch('/api/subscribe', {
+      await fetch(BACKEND_URL + '/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: currentUser.id, subscription })
