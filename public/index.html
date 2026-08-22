@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShadowLink</title>
+  <!-- Outfit & Inter Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+  <!-- Background Glows -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <div id="app" class="app-container">
+
+    <!-- ==================== LOGIN SCREEN ==================== -->
+    <section id="login-screen" class="screen active">
+      <div class="login-card glass">
+        <div class="login-header">
+          <div class="logo-icon">
+            <i class="fa-solid fa-ghost"></i>
+          </div>
+          <h1>ShadowLink</h1>
+          <p>Select your profile to enter chat</p>
+        </div>
+        <div id="users-grid" class="users-grid">
+          <!-- Populated dynamically via JS -->
+          <div class="loading">Loading team...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DASHBOARD SCREEN ==================== -->
+    <section id="dashboard-screen" class="screen">
+      <div class="dashboard-layout glass">
+
+        <!-- Sidebar: User Info & Contacts list -->
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div class="current-user-info">
+              <div id="current-user-avatar" class="avatar"></div>
+              <div class="user-meta">
+                <h3 id="current-user-name">Loading...</h3>
+              </div>
+            </div>
+            <button id="logout-btn" class="icon-btn" title="Switch User">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+
+          <div class="sidebar-title">
+            <span>TEAM MEMBERS</span>
+            <span class="active-count"><span id="online-count">0</span>/10 online</span>
+          </div>
+
+          <div id="contacts-list" class="contacts-list">
+            <!-- Dynamically populated contacts -->
+          </div>
+        </aside>
+
+        <!-- Main Chat Area -->
+        <main class="chat-area">
+          <div id="chat-placeholder" class="chat-placeholder active">
+            <i class="fa-regular fa-comments"></i>
+            <h2>Start a Quick Snap</h2>
+            <p>Select a colleague from the team list to send a short, self-destructing message.</p>
+          </div>
+
+          <div id="chat-window" class="chat-window">
+            <!-- Chat Header -->
+            <div class="chat-header">
+              <button id="back-btn" class="back-btn" title="Back to list">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <div class="chat-recipient-info">
+                <div id="recipient-avatar" class="avatar"></div>
+                <div class="recipient-meta">
+                  <h3 id="recipient-name">Recipient Name</h3>
+                  <span id="recipient-status">offline</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Messages List -->
+            <div id="messages-list" class="messages-list">
+              <!-- Dynamically populated messages -->
+            </div>
+
+            <!-- Input area -->
+            <div class="chat-input-container">
+              <form id="message-form" class="message-form">
+                <div class="input-wrapper">
+                  <input type="text" id="message-input" autocomplete="off"
+                    placeholder="Type a snap... (max 160 characters)" maxlength="160">
+                  <span id="char-counter">160</span>
+                </div>
+                <button type="submit" id="send-btn" class="send-btn" disabled>
+                  <i class="fa-solid fa-paper-plane"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </main>
+      </div>
+    </section>
+  </div>
+
+  <!-- Message viewer overlay (for clicking snaps) -->
+  <div id="snap-viewer-overlay" class="snap-viewer-overlay">
+    <div class="snap-viewer-card glass">
+      <div class="snap-viewer-header">
+        <div class="viewer-sender-info">
+          <div id="viewer-avatar" class="avatar"></div>
+          <span id="viewer-sender-name">Name</span>
+        </div>
+        <div class="countdown-circle">
+          <svg>
+            <circle cx="18" cy="18" r="15"></circle>
+            <circle id="countdown-progress" cx="18" cy="18" r="15"></circle>
+          </svg>
+          <span id="countdown-number">10</span>
+        </div>
+      </div>
+      <div class="snap-content-body">
+        <p id="snap-text-content">Loading message...</p>
+      </div>
+      <div class="snap-viewer-footer">
+        <span>Message will self-destruct</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PIN Authentication Overlay -->
+  <div id="pin-auth-overlay" class="pin-auth-overlay">
+    <div class="pin-auth-card glass">
+      <div class="pin-auth-header">
+        <div id="pin-avatar" class="avatar"></div>
+        <h2 id="pin-title">Verify PIN</h2>
+        <p id="pin-desc">Enter your 4-digit PIN to secure access</p>
+      </div>
+      <form id="pin-form" class="pin-form">
+        <input type="password" id="pin-input" pattern="[0-9]*" inputmode="numeric" maxlength="4" autocomplete="off"
+          placeholder="••••">
+        <span id="pin-error-msg" class="pin-error-msg">Incorrect PIN. Try again.</span>
+        <div class="pin-actions">
+          <button type="button" id="pin-cancel-btn" class="pin-cancel-btn">Cancel</button>
+          <button type="submit" id="pin-submit-btn" class="pin-submit-btn" disabled>Verify</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script src="app.js?v=3"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker Registered!', reg))
+          .catch(err => console.warn('Service Worker registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
