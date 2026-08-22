@@ -43,11 +43,11 @@ self.addEventListener('push', (e) => {
       }
     }
     const options = {
-      body: data.body || "You received a new disappearing snap!",
+      body: data.body || "You received a new disappearing message",
       icon: 'https://img.icons8.com/color/192/000000/ghost.png',
       badge: 'https://img.icons8.com/color/96/000000/ghost.png',
       tag: data.tag || 'new-snap',
-      vibrate: [100, 50, 100],
+      vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 200], // Wake-up vibration pattern
       data: { senderId: data.senderId }
     };
     

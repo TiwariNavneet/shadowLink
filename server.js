@@ -203,8 +203,8 @@ io.on('connection', (socket) => {
     if (subscription) {
       const sender = users.find(u => u.id === currentUserId);
       const payload = JSON.stringify({
-        title: `New Snap from ${sender ? sender.name : 'Someone'}`,
-        body: 'You received a new disappearing snap!',
+        title: `New message from ${sender ? sender.name : 'Someone'}`,
+        body: 'You received a new disappearing message',
         tag: newMessage.id,
         senderId: currentUserId
       });

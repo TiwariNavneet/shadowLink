@@ -791,11 +791,11 @@ function showLocalNotification(msg) {
       const senderName = sender ? sender.name : "Someone";
       
       const options = {
-        body: "You received a new disappearing snap!",
+        body: "You received a new disappearing message",
         icon: "https://img.icons8.com/color/192/000000/ghost.png",
         tag: msg.id,
         badge: "https://img.icons8.com/color/96/000000/ghost.png",
-        vibrate: [100, 50, 100],
+        vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 200], // Wake-up vibration pattern
         data: { senderId: msg.from }
       };
 
