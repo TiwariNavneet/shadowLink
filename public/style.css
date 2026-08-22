@@ -1053,4 +1053,28 @@ body {
   cursor: not-allowed;
 }
 
+/* ==================== SECURITY & SCREENSHOT PROTECTION ==================== */
+@media print {
+  html, body {
+    display: none !important;
+  }
+}
+
+/* Disable text selection and copying across the application */
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Allow text input fields to still function properly */
+input, textarea {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
 

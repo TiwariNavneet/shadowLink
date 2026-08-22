@@ -468,6 +468,13 @@ function capitalize(str) {
 
 // Request to open snap
 window.openSnap = function(messageId) {
+  // Security Restriction: Messages can only be opened/viewed on mobile devices
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+  if (!isMobileDevice) {
+    alert("Security Restriction: Disappearing messages can only be opened and viewed on mobile devices.");
+    return;
+  }
+
   if (!isOfflineMode && socket) {
     socket.emit('open-message', messageId);
   } else {
@@ -819,6 +826,98 @@ function showLocalNotification(msg) {
     }
   }
 }
+
+// ==================== SECURITY & SCREENSHOT PROTECTION ====================
+
+// Disable Right-Click context menu to block "Inspect" access
+document.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
+
+// Intercept and disable common Developer Tools shortcuts
+document.addEventListener('keydown', (e) => {
+  // Disable F12
+  if (e.key === 'F12') {
+    e.preventDefault();
+    return false;
+  }
+  // Disable Ctrl+Shift+I (Inspect), Ctrl+Shift+J (Console), Ctrl+Shift+C (Element Selector)
+  if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
+    e.preventDefault();
+    return false;
+  }
+  // Disable Cmd+Opt+I / Cmd+Opt+J / Cmd+Opt+C on Mac
+  if (e.metaKey && e.altKey && (e.key === 'I' || e.key === 'J' || e.key === 'C' || e.key === 'i' || e.key === 'j' || e.key === 'c')) {
+    e.preventDefault();
+    return false;
+  }
+  // Disable Ctrl+U (View Source)
+  if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
+    e.preventDefault();
+    return false;
+  }
+  // Disable Cmd+Opt+U on Mac
+  if (e.metaKey && e.altKey && (e.key === 'U' || e.key === 'u')) {
+    e.preventDefault();
+    return false;
+  }
+  // Disable Print Screen key and clear clipboard content
+  if (e.key === 'PrintScreen') {
+    navigator.clipboard.writeText('');
+    alert('Security Alert: Screenshots are disabled on this application.');
+    e.preventDefault();
+    return false;
+  }
+});
+
+// Clear clipboard on PrintScreen key release
+window.addEventListener('keyup', (e) => {
+  if (e.key === 'PrintScreen') {
+    navigator.clipboard.writeText('');
+  }
+});
+
+// Blur entire app screen when phone screen locks or app loses focus (prevents multitask list screenshot grabbing on mobile)
+window.addEventListener('blur', () => {
+  document.body.style.filter = 'blur(20px)';
+});
+window.addEventListener('focus', () => {
+  document.body.style.filter = 'none';
+});
+
+// DevTools Active Detection Loop
+setInterval(() => {
+  const threshold = 160;
+  const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+  const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+  
+  if (widthThreshold || heightThreshold) {
+    document.body.innerHTML = `
+      <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #0a0e17; color: #ff4c4b; font-family: sans-serif; text-align: center; padding: 20px;">
+        <h1 style="font-size: 2rem; margin-bottom: 10px;">Security Alert</h1>
+        <p style="font-size: 1.1rem;">Developer Tools / Inspect Element detection triggered. Access Blocked.</p>
+      </div>
+    `;
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
+  
+  // Debugger timing analysis detection
+  (function() {
+    const start = new Date();
+    debugger;
+    const end = new Date();
+    if (end - start > 100) {
+      document.body.innerHTML = `
+        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; background: #0a0e17; color: #ff4c4b; font-family: sans-serif; text-align: center; padding: 20px;">
+          <h1 style="font-size: 2rem; margin-bottom: 10px;">Security Alert</h1>
+          <p style="font-size: 1.1rem;">Inspect element is disabled on this app.</p>
+        </div>
+      `;
+    }
+  })();
+}, 1000);
 
 // Initialize App
 fetchUsers();
