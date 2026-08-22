@@ -20,7 +20,7 @@ const staticUsers = [
 // Determine backend server URL dynamically
 const BACKEND_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('192.168.') || window.location.hostname.includes('loca.lt')
   ? '' // Connects to local host
-  : 'https://shadowlink-backend.onrender.com'; // Change this to your Render URL after deploying backend!
+  : 'https://shadowlink-2tnf.onrender.com';
 
 // Initialize Socket.io safely
 let socket = null;
