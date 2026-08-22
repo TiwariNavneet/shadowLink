@@ -31,17 +31,16 @@ if (fs.existsSync(DB_FILE)) {
   fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
 }
 
-// Generate VAPID keys dynamically if not exists
-if (!dbData.vapidKeys) {
-  dbData.vapidKeys = webpush.generateVAPIDKeys();
-  fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2));
-}
+// Static permanent VAPID keys (avoids key mismatch on Render container restarts)
+const VAPID_KEYS = {
+  publicKey: 'BLB7ZPCX72wvFbQkuhY7sJL3V1FxDdTA9WuHmuZvp7EGVHxgmfZeF9jl6YFTDk2kxhr-DQgBPKfU1EeVr9taKaE',
+  privateKey: '7M-tb2bdUD9IfzEb17Ciqar2fz6_BQMSW9nVzbr_h5w'
+};
 
-// Configure web-push details
 webpush.setVapidDetails(
   'mailto:admin@shadowlink.local',
-  dbData.vapidKeys.publicKey,
-  dbData.vapidKeys.privateKey
+  VAPID_KEYS.publicKey,
+  VAPID_KEYS.privateKey
 );
 
 // Predefined 9 secret codename users mapped to real names
@@ -121,7 +120,7 @@ app.post('/api/set-pin', (req, res) => {
 
 // Get VAPID Public Key
 app.get('/api/vapid-public-key', (req, res) => {
-  res.json({ publicKey: dbData.vapidKeys.publicKey });
+  res.json({ publicKey: VAPID_KEYS.publicKey });
 });
 
 // Save Web Push Subscription for a user

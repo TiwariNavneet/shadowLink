@@ -741,17 +741,19 @@ async function requestNotificationPermission() {
       
       // Get existing subscription
       let subscription = await reg.pushManager.getSubscription();
-      
-      if (!subscription) {
-        // Fetch VAPID public key from backend
-        const keyRes = await fetch(BACKEND_URL + '/api/vapid-public-key');
-        const { publicKey } = await keyRes.json();
-
-        subscription = await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(publicKey)
-        });
+      if (subscription) {
+        // Unsubscribe to guarantee a fresh registration matching current server keys
+        await subscription.unsubscribe();
       }
+      
+      // Fetch VAPID public key from backend
+      const keyRes = await fetch(BACKEND_URL + '/api/vapid-public-key');
+      const { publicKey } = await keyRes.json();
+
+      subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey)
+      });
 
       // Send subscription object to server database
       await fetch(BACKEND_URL + '/api/subscribe', {
