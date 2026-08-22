@@ -255,6 +255,7 @@ function loginAs(user) {
       onlineUsers.add(user.id);
       loadOfflineHistory();
     }
+    requestNotificationPermission();
     renderContacts();
   } catch (err) {
     console.error("Error inside loginAs: " + err.message);
@@ -738,6 +739,7 @@ if (!isOfflineMode && socket) {
       playSound('send');
     } else {
       playSound('receive');
+      showLocalNotification(msg); // Trigger push notification for received snaps
     }
     renderContacts();
     renderMessages();
@@ -770,6 +772,39 @@ if (!isOfflineMode && socket) {
   socket.on('error-msg', (msg) => {
     alert(msg);
   });
+}
+
+// Native HTML5 Web Notification handlers for PWA
+function requestNotificationPermission() {
+  if ('Notification' in window) {
+    if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
+  }
+}
+
+function showLocalNotification(msg) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    // Only send notification if document is hidden OR sender is not the currently active chat
+    if (msg.from !== currentUser.id && (document.hidden || msg.from !== activeRecipientId)) {
+      const sender = usersList.find(u => u.id === msg.from);
+      const senderName = sender ? sender.name : "Someone";
+      
+      const notification = new Notification(`New message from ${senderName}`, {
+        body: "You received a new disappearing snap!",
+        icon: "https://img.icons8.com/color/192/000000/ghost.png",
+        tag: msg.id
+      });
+
+      notification.onclick = () => {
+        window.focus();
+        if (sender) {
+          selectRecipient(sender);
+        }
+        notification.close();
+      };
+    }
+  }
 }
 
 // Initialize App
