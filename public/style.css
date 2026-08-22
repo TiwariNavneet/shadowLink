@@ -154,36 +154,50 @@ body {
   font-size: 0.95rem;
 }
 
-.users-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-  margin-top: 25px;
+.login-form {
+  display: flex;
+  flex-direction: column;
+  max-width: 320px;
+  margin: 0 auto;
 }
 
-.user-select-name-btn {
+.login-form .input-wrapper input {
+  width: 100%;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border: 1px solid var(--border-color);
   padding: 16px 20px;
-  border-radius: 14px;
-  cursor: pointer;
+  border-radius: 16px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  outline: none;
   transition: var(--transition-smooth);
   text-align: center;
 }
 
-.user-select-name-btn:hover {
-  background: rgba(255, 252, 0, 0.08);
-  border-color: rgba(255, 252, 0, 0.25);
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px -5px rgba(255, 252, 0, 0.15);
+.login-form .input-wrapper input:focus {
+  border-color: rgba(255, 252, 0, 0.5);
+  box-shadow: 0 0 15px var(--accent-glow);
 }
 
-.user-select-name-btn:active {
+.login-submit-btn {
+  background: var(--accent-color);
+  border: none;
+  color: #000;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  width: 100%;
+}
+
+.login-submit-btn:hover {
+  box-shadow: 0 0 20px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+.login-submit-btn:active {
   transform: translateY(0);
 }
 

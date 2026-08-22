@@ -48,7 +48,10 @@ let activeCountdownInterval = null;
 // DOM Elements
 const loginScreen = document.getElementById('login-screen');
 const dashboardScreen = document.getElementById('dashboard-screen');
-const usersGrid = document.getElementById('users-grid');
+const loginForm = document.getElementById('login-form');
+const loginIdInput = document.getElementById('login-id-input');
+const loginPinInput = document.getElementById('login-pin-input');
+const loginErrorMsg = document.getElementById('login-error-msg');
 const contactsList = document.getElementById('contacts-list');
 const onlineCountEl = document.getElementById('online-count');
 
@@ -144,93 +147,29 @@ async function fetchUsers() {
     const res = await fetch('/api/users');
     if (!res.ok) throw new Error("HTTP error " + res.status);
     usersList = await res.json();
-    renderUsersGrid();
   } catch (err) {
     console.warn("Error fetching /api/users, falling back to static list", err);
     isOfflineMode = true;
     usersList = staticUsers;
     staticUsers.forEach(u => onlineUsers.add(u.id));
-    renderUsersGrid();
     loadOfflineHistory();
   }
-}
 
-let pendingLoginUser = null;
-let isSettingNewPin = false;
-
-// Triggered when a user card is clicked
-function requestPinLogin(user) {
-  pendingLoginUser = user;
-  pinErrorMsg.style.display = 'none';
-  pinInput.value = '';
-  pinSubmitBtn.disabled = true;
-
-  // Set avatar in modal
-  pinAvatar.style.background = user.avatarColor;
-  pinAvatar.textContent = getInitials(user.name);
-
-  // Check if PIN status is set
-  if (isOfflineMode) {
-    const offlinePins = JSON.parse(localStorage.getItem('snap_pins') || '{}');
-    const existingPin = offlinePins[user.id];
-    if (!existingPin) {
-      isSettingNewPin = true;
-      pinTitle.textContent = "Create PIN";
-      pinDesc.textContent = "Choose a 4-digit PIN to secure your profile";
-      pinSubmitBtn.textContent = "Set PIN";
-    } else {
-      isSettingNewPin = false;
-      pinTitle.textContent = "Verify PIN";
-      pinDesc.textContent = "Enter your 4-digit PIN to login";
-      pinSubmitBtn.textContent = "Verify";
-    }
-    pinAuthOverlay.classList.add('active');
-    setTimeout(() => pinInput.focus(), 100);
-  } else {
-    // Online check
-    fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: user.id, pin: '' }) // empty PIN checks status
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === 'NO_PIN') {
-        isSettingNewPin = true;
-        pinTitle.textContent = "Create PIN";
-        pinDesc.textContent = "Choose a 4-digit PIN to secure your profile";
-        pinSubmitBtn.textContent = "Set PIN";
-      } else {
-        isSettingNewPin = false;
-        pinTitle.textContent = "Verify PIN";
-        pinDesc.textContent = "Enter your 4-digit PIN to login";
-        pinSubmitBtn.textContent = "Verify";
+  // Auto-login if session exists in LocalStorage
+  const savedSession = localStorage.getItem('shadow_session');
+  if (savedSession) {
+    try {
+      const user = JSON.parse(savedSession);
+      if (usersList.some(u => u.id === user.id)) {
+        loginAs(user);
       }
-      pinAuthOverlay.classList.add('active');
-      setTimeout(() => pinInput.focus(), 100);
-    })
-    .catch(err => {
-      console.warn("Online PIN check failed, using offline fallback", err);
-      isOfflineMode = true;
-      requestPinLogin(user);
-    });
+    } catch (e) {
+      localStorage.removeItem('shadow_session');
+    }
   }
-}
-
-// Render the secret codename list in login screen
-function renderUsersGrid() {
-  usersGrid.innerHTML = '';
-  usersList.forEach(user => {
-    const btn = document.createElement('button');
-    btn.className = 'user-select-name-btn';
-    btn.textContent = user.name;
-    btn.addEventListener('click', () => requestPinLogin(user));
-    usersGrid.appendChild(btn);
-  });
 }
 
 function getInitials(name) {
-  // Return first letter of name
   return name.charAt(0);
 }
 
@@ -262,62 +201,78 @@ function loginAs(user) {
   }
 }
 
-// Listeners for PIN Modal
-pinInput.addEventListener('input', () => {
-  pinInput.value = pinInput.value.replace(/[^0-9]/g, '');
-  pinSubmitBtn.disabled = pinInput.value.length !== 4;
-});
-
-pinCancelBtn.addEventListener('click', () => {
-  pinAuthOverlay.classList.remove('active');
-  pendingLoginUser = null;
-});
-
-pinForm.addEventListener('submit', (e) => {
+// Login Form Submit (ID & Password / PIN)
+loginForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const enteredPin = pinInput.value;
-  if (enteredPin.length !== 4 || !pendingLoginUser) return;
+  loginErrorMsg.style.display = 'none';
+  const enteredId = loginIdInput.value.trim();
+  const enteredPin = loginPinInput.value.trim();
+
+  if (!enteredId || enteredPin.length !== 4) return;
+
+  // Find user by codename (case insensitive)
+  const user = usersList.find(u => u.name.toLowerCase() === enteredId.toLowerCase());
+  if (!user) {
+    loginErrorMsg.textContent = "Invalid Codename. Access Denied.";
+    loginErrorMsg.style.display = 'block';
+    playSound('destroy');
+    return;
+  }
 
   if (isOfflineMode) {
     const offlinePins = JSON.parse(localStorage.getItem('snap_pins') || '{}');
-    if (isSettingNewPin) {
-      offlinePins[pendingLoginUser.id] = enteredPin;
-      localStorage.setItem('snap_pins', JSON.stringify(offlinePins));
-      pinAuthOverlay.classList.remove('active');
-      loginAs(pendingLoginUser);
-    } else {
-      if (offlinePins[pendingLoginUser.id] === enteredPin) {
-        pinAuthOverlay.classList.remove('active');
-        loginAs(pendingLoginUser);
-      } else {
-        pinErrorMsg.style.display = 'block';
-        pinInput.value = '';
-        pinSubmitBtn.disabled = true;
-        playSound('destroy');
+    const existingPin = offlinePins[user.id];
+    if (!existingPin) {
+      const confirmSetup = confirm(`Secure this profile (${user.name}) with the entered PIN?`);
+      if (confirmSetup) {
+        offlinePins[user.id] = enteredPin;
+        localStorage.setItem('snap_pins', JSON.stringify(offlinePins));
+        localStorage.setItem('shadow_session', JSON.stringify(user));
+        loginAs(user);
       }
+    } else if (existingPin === enteredPin) {
+      localStorage.setItem('shadow_session', JSON.stringify(user));
+      loginAs(user);
+    } else {
+      loginErrorMsg.textContent = "Incorrect PIN. Access Denied.";
+      loginErrorMsg.style.display = 'block';
+      playSound('destroy');
     }
   } else {
-    const url = isSettingNewPin ? '/api/set-pin' : '/api/login';
-    fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: pendingLoginUser.id, pin: enteredPin })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === 'SUCCESS') {
-        pinAuthOverlay.classList.remove('active');
-        loginAs(pendingLoginUser);
+    // Online verification
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, pin: enteredPin })
+      });
+      const data = await res.json();
+
+      if (data.status === 'NO_PIN') {
+        const confirmSetup = confirm(`Secure this profile (${user.name}) with the entered PIN?`);
+        if (confirmSetup) {
+          const setRes = await fetch('/api/set-pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: user.id, pin: enteredPin })
+          });
+          const setData = await setRes.json();
+          if (setData.status === 'SUCCESS') {
+            localStorage.setItem('shadow_session', JSON.stringify(user));
+            loginAs(user);
+          }
+        }
+      } else if (data.status === 'SUCCESS') {
+        localStorage.setItem('shadow_session', JSON.stringify(user));
+        loginAs(user);
       } else {
-        pinErrorMsg.style.display = 'block';
-        pinInput.value = '';
-        pinSubmitBtn.disabled = true;
+        loginErrorMsg.textContent = "Incorrect PIN. Access Denied.";
+        loginErrorMsg.style.display = 'block';
         playSound('destroy');
       }
-    })
-    .catch(err => {
-      alert("Error verifying PIN: " + err.message);
-    });
+    } catch (err) {
+      alert("Error logging in: " + err.message);
+    }
   }
 });
 
@@ -648,6 +603,7 @@ logoutBtn.addEventListener('click', () => {
   currentUser = null;
   activeRecipientId = null;
   messageHistory = [];
+  localStorage.removeItem('shadow_session');
   
   document.querySelector('.dashboard-layout').classList.remove('chat-mode');
 

@@ -32,12 +32,18 @@
             <i class="fa-solid fa-ghost"></i>
           </div>
           <h1>ShadowLink</h1>
-          <p>Select your profile to enter chat</p>
+          <p>Enter your credentials to access the chat</p>
         </div>
-        <div id="users-grid" class="users-grid">
-          <!-- Populated dynamically via JS -->
-          <div class="loading">Loading team...</div>
-        </div>
+        <form id="login-form" class="login-form">
+          <div class="input-wrapper">
+            <input type="text" id="login-id-input" placeholder="Codename (e.g., Shadow)" required autocomplete="off">
+          </div>
+          <div class="input-wrapper" style="margin-top: 15px;">
+            <input type="password" id="login-pin-input" pattern="[0-9]*" inputmode="numeric" maxlength="4" placeholder="4-digit PIN" required autocomplete="off">
+          </div>
+          <span id="login-error-msg" class="login-error-msg" style="display: none; color: var(--accent-red); font-size: 0.85rem; margin-top: 10px; font-weight: 500;"></span>
+          <button type="submit" id="login-submit-btn" class="login-submit-btn" style="margin-top: 20px;">Enter Chat</button>
+        </form>
       </div>
     </section>
 
