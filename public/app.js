@@ -293,11 +293,11 @@ function renderContacts() {
 
     if (lastMsg) {
       if (lastMsg.status === 'unopened') {
-        detailText = lastMsg.from === currentUser.id ? 'Sent a snap' : 'New snap received!';
+        detailText = lastMsg.from === currentUser.id ? 'Sent a message' : 'New message received!';
       } else if (lastMsg.status === 'opened') {
-        detailText = 'Snap viewed';
+        detailText = 'Message viewed';
       } else {
-        detailText = 'Snap destroyed';
+        detailText = 'Message destroyed';
       }
     }
 
@@ -382,8 +382,8 @@ function renderMessages() {
     messagesList.innerHTML = `
       <div class="chat-placeholder active" style="position: static; padding: 20px;">
         <i class="fa-regular fa-paper-plane" style="font-size: 2.5rem;"></i>
-        <h3>Send a snap!</h3>
-        <p>Your chat will remain private. Snaps disappear after being opened.</p>
+        <h3>Send a message!</h3>
+        <p>Your chat will remain private. Messages disappear after being opened.</p>
       </div>
     `;
     return;
@@ -402,7 +402,7 @@ function renderMessages() {
       innerHTML = `
         <div class="message-bubble">
           <div class="message-bubble-header">
-            <span><i class="fa-solid fa-ghost snap-icon"></i>Short Snap</span>
+            <span><i class="fa-solid fa-ghost snap-icon"></i>Short Message</span>
           </div>
           <div class="snap-status-text">
             ${getStatusIcon(msg.status)}
@@ -416,7 +416,7 @@ function renderMessages() {
         innerHTML = `
           <div class="message-bubble">
             <div class="message-bubble-header">
-              <span>New Snap Received</span>
+              <span>New Message Received</span>
             </div>
             <button class="snap-action-btn" onclick="openSnap('${msg.id}')">
               <i class="fa-solid fa-eye"></i> Tap to View
@@ -428,10 +428,10 @@ function renderMessages() {
         innerHTML = `
           <div class="message-bubble">
             <div class="message-bubble-header">
-              <span>Snap Opened</span>
+              <span>Message Opened</span>
             </div>
             <div class="snap-destroyed-placeholder">
-              <i class="fa-solid fa-spinner fa-spin"></i> Viewing snap...
+              <i class="fa-solid fa-spinner fa-spin"></i> Viewing message...
             </div>
             <span class="message-time">${formattedTime}</span>
           </div>
@@ -440,7 +440,7 @@ function renderMessages() {
         innerHTML = `
           <div class="message-bubble">
             <div class="message-bubble-header">
-              <span>Snap Status</span>
+              <span>Message Status</span>
             </div>
             <div class="snap-destroyed-placeholder">
               <i class="fa-solid fa-fire"></i> Message self-destructed

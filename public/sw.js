@@ -39,15 +39,16 @@ self.addEventListener('push', (e) => {
       try {
         data = e.data.json();
       } catch (err) {
-        data = { title: "New Snap", body: e.data.text() };
+        data = { title: "New Message", body: e.data.text() };
       }
     }
     const options = {
       body: data.body || "You received a new disappearing message",
       icon: 'https://img.icons8.com/color/192/000000/ghost.png',
       badge: 'https://img.icons8.com/color/96/000000/ghost.png',
-      tag: data.tag || 'new-snap',
+      tag: data.tag || 'new-message',
       vibrate: [500, 110, 500, 110, 450, 110, 200, 110, 200], // Wake-up vibration pattern
+      sound: 'default', // Trigger default device sound to wake screen
       requireInteraction: true, // Keep notification active to wake screen
       renotify: true, // Force sound/vibe on new messages
       actions: [
