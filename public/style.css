@@ -43,6 +43,7 @@ body {
   filter: blur(150px);
   z-index: -1;
   opacity: 0.15;
+  pointer-events: none; /* Prevent blocking touch/scroll events */
 }
 
 .bg-glow-1 {
@@ -109,6 +110,8 @@ body {
   text-align: center;
   max-height: calc(100vh - 80px);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Enable momentum scrolling on iOS */
+  scroll-behavior: smooth;
 }
 
 .login-header {
@@ -306,6 +309,8 @@ body {
   flex: 1;
   overflow-y: auto;
   padding: 10px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .contact-card {
@@ -481,6 +486,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
 
 .message-bubble-wrapper {
