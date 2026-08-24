@@ -7,11 +7,11 @@ window.onerror = function(message, source, lineno, colno, error) {
 // Static 9 users list to fallback on when server is offline or page is opened via file://
 const staticUsers = [
   { id: 'u1', name: 'Raven', realName: 'Deepak Nautiyal', avatarColor: 'linear-gradient(135deg, #FF6B6B, #FF8E53)' },
-  { id: 'u2', name: 'Cipher', realName: 'Ayush Sharma', avatarColor: 'linear-gradient(135deg, #F3A683, #F19066)' },
+  { id: 'u2', name: 'Python', realName: 'Ayush Sharma', avatarColor: 'linear-gradient(135deg, #F3A683, #F19066)' },
   { id: 'u3', name: 'Falcon', realName: 'Vipul Tiwari', avatarColor: 'linear-gradient(135deg, #4834D4, #686DE0)' },
   { id: 'u4', name: 'Orion', realName: 'Sanjay Upadhaye', avatarColor: 'linear-gradient(135deg, #1DD1A1, #10AC84)' },
   { id: 'u5', name: 'Shadow', realName: 'Navneet Tiwari', avatarColor: 'linear-gradient(135deg, #FF9F43, #FFB142)' },
-  { id: 'u6', name: 'Viper', realName: 'Amit Chahar', avatarColor: 'linear-gradient(135deg, #0984E3, #74B9FF)' },
+  { id: 'u6', name: 'Cipher', realName: 'Amit Chahar', avatarColor: 'linear-gradient(135deg, #0984E3, #74B9FF)' },
   { id: 'u7', name: 'Phoenix', realName: 'Tattvam Shiva Chaturvedi', avatarColor: 'linear-gradient(135deg, #2C3E50, #34495E)' },
   { id: 'u8', name: 'Ghost', realName: 'Prakhar Kumar Singh', avatarColor: 'linear-gradient(135deg, #E84393, #FD79A8)' },
   { id: 'u9', name: 'Wolf', realName: 'Manas Maurya', avatarColor: 'linear-gradient(135deg, #6C5CE7, #A29BFE)' }
@@ -72,6 +72,14 @@ const messageInput = document.getElementById('message-input');
 const charCounter = document.getElementById('char-counter');
 const sendBtn = document.getElementById('send-btn');
 const backBtn = document.getElementById('back-btn');
+
+// Emojis & Stickers Picker DOM Elements
+const emojiBtn = document.getElementById('emoji-btn');
+const emojiPickerContainer = document.getElementById('emoji-picker-container');
+const tabEmojis = document.getElementById('tab-emojis');
+const tabStickers = document.getElementById('tab-stickers');
+const emojiGrid = document.getElementById('emoji-grid');
+const stickerGrid = document.getElementById('sticker-grid');
 
 // PIN Authentication DOM Elements
 const pinAuthOverlay = document.getElementById('pin-auth-overlay');
@@ -401,9 +409,9 @@ function renderMessages() {
 
     if (isSentByMe) {
       innerHTML = `
-        <div class="message-bubble">
+        <div class="message-bubble ${msg.type === 'sticker' ? 'sticker-bubble' : ''}">
           <div class="message-bubble-header">
-            <span><i class="fa-solid fa-ghost snap-icon"></i>Short Message</span>
+            <span><i class="fa-solid fa-ghost snap-icon"></i>${msg.type === 'sticker' ? 'Short Sticker' : 'Short Message'}</span>
           </div>
           <div class="snap-status-text">
             ${getStatusIcon(msg.status)}
@@ -415,9 +423,9 @@ function renderMessages() {
     } else {
       if (msg.status === 'unopened') {
         innerHTML = `
-          <div class="message-bubble">
+          <div class="message-bubble ${msg.type === 'sticker' ? 'sticker-bubble' : ''}">
             <div class="message-bubble-header">
-              <span>New Message Received</span>
+              <span>${msg.type === 'sticker' ? 'New Sticker Received' : 'New Message Received'}</span>
             </div>
             <button class="snap-action-btn" onclick="openSnap('${msg.id}')">
               <i class="fa-solid fa-eye"></i> Tap to View
@@ -511,7 +519,7 @@ function showSnapViewer(msg) {
   viewerAvatar.textContent = sender ? getInitials(sender.name) : '??';
   
   activeMessageBeingViewed = msg;
-  snapTextContent.textContent = "👆 Press and HOLD here to read the message";
+  snapTextContent.textContent = "👆 Press and HOLD here to view";
   snapViewerOverlay.classList.add('active');
 
   const duration = msg.openTimer;
@@ -555,14 +563,18 @@ const snapContentBody = document.querySelector('.snap-content-body');
 
 const revealMessage = () => {
   if (activeMessageBeingViewed) {
-    snapTextContent.textContent = activeMessageBeingViewed.text;
+    if (activeMessageBeingViewed.type === 'sticker') {
+      snapTextContent.innerHTML = `<img src="${activeMessageBeingViewed.text}" class="sticker-img">`;
+    } else {
+      snapTextContent.textContent = activeMessageBeingViewed.text;
+    }
     snapTextContent.style.filter = 'none';
   }
 };
 
 const hideMessage = () => {
   if (activeMessageBeingViewed) {
-    snapTextContent.textContent = "👆 Press and HOLD here to read the message";
+    snapTextContent.textContent = "👆 Press and HOLD here to view";
     snapTextContent.style.filter = 'blur(4px)';
   }
 };
@@ -952,6 +964,118 @@ setInterval(() => {
     }
   })();
 }, 1000);
+
+// ==================== EMOJIS & STICKERS INTERACTION ENGINE ====================
+
+const staticEmojis = [
+  "😀", "😃", "😄", "😁", "😆", "😅", "😂", "🤣", "😊", "😇", "🙂", "🙃",
+  "😉", "😌", "😍", "🥰", "😘", "😗", "😙", "😚", "😋", "😛", "😝", "😜",
+  "🤪", "🤨", "🧐", "🤓", "😎", "🤩", "🥳", "😏", "😒", "😞", "😔", "😟",
+  "🤯", "😱", "🥶", "🥵", "😈", "💀", "👻", "👽", "🤖", "💩", "🔥", "✨",
+  "👍", "👎", "👊", "✊", "🤛", "🤜", "🤞", "🤟", "🤘", "👌", "👈", "👉",
+  "💖", "❤️", "💔", "💯", "🎉", "⚡", "🌟", "🌙", "👑", "🔮", "🔒", "🔑"
+];
+
+const staticStickers = [
+  "https://img.icons8.com/color/120/000000/ghost.png",
+  "https://img.icons8.com/color/120/000000/boo.png",
+  "https://img.icons8.com/color/120/000000/casper.png",
+  "https://img.icons8.com/color/120/000000/pumpkin.png",
+  "https://img.icons8.com/color/120/000000/halloween-overcoat.png",
+  "https://img.icons8.com/office/120/000000/ghost.png",
+  "https://img.icons8.com/external-flatart-icons-flat-flatarticons/120/000000/external-ghost-halloween-flatart-icons-flat-flatarticons.png",
+  "https://img.icons8.com/external-justicon-flat-justicon/120/000000/external-ghost-halloween-justicon-flat-justicon.png",
+  "https://img.icons8.com/clouds/120/000000/ghost.png",
+  "https://img.icons8.com/doodle/120/000000/ghost--v1.png",
+  "https://img.icons8.com/plasticine/120/000000/ghost.png",
+  "https://img.icons8.com/color/120/000000/grim-reaper.png"
+];
+
+// Initialize Emojis Grid
+staticEmojis.forEach(emoji => {
+  const el = document.createElement('div');
+  el.className = 'emoji-item';
+  el.textContent = emoji;
+  el.addEventListener('click', () => {
+    messageInput.value += emoji;
+    messageInput.focus();
+    sendBtn.disabled = messageInput.value.trim().length === 0;
+    charCounter.textContent = 160 - messageInput.value.length;
+  });
+  emojiGrid.appendChild(el);
+});
+
+// Initialize Stickers Grid
+staticStickers.forEach(stickerUrl => {
+  const el = document.createElement('img');
+  el.className = 'sticker-item';
+  el.src = stickerUrl;
+  el.addEventListener('click', () => {
+    sendSticker(stickerUrl);
+  });
+  stickerGrid.appendChild(el);
+});
+
+// Send sticker function
+function sendSticker(stickerUrl) {
+  if (activeRecipientId) {
+    if (!isOfflineMode && socket) {
+      socket.emit('send-message', {
+        to: activeRecipientId,
+        text: stickerUrl,
+        type: 'sticker'
+      });
+    } else {
+      const newMsg = {
+        id: 'msg_' + Math.random().toString(36).substr(2, 9),
+        from: currentUser.id,
+        to: activeRecipientId,
+        text: stickerUrl,
+        type: 'sticker',
+        timestamp: Date.now(),
+        status: 'unopened',
+        openTimer: 10,
+        expiresAt: null
+      };
+      messageHistory.push(newMsg);
+      saveOfflineHistory();
+      playSound('send');
+      renderContacts();
+      renderMessages();
+    }
+    emojiPickerContainer.classList.remove('active');
+  }
+}
+
+// Toggle Picker active class
+emojiBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  emojiPickerContainer.classList.toggle('active');
+});
+
+// Tab Switch Logic
+tabEmojis.addEventListener('click', (e) => {
+  e.stopPropagation();
+  tabEmojis.classList.add('active');
+  tabStickers.classList.remove('active');
+  emojiGrid.classList.add('active');
+  stickerGrid.classList.remove('active');
+});
+
+tabStickers.addEventListener('click', (e) => {
+  e.stopPropagation();
+  tabStickers.classList.add('active');
+  tabEmojis.classList.remove('active');
+  stickerGrid.classList.add('active');
+  emojiGrid.classList.remove('active');
+});
+
+// Close picker when clicking outside of it
+document.addEventListener('click', (e) => {
+  if (emojiPickerContainer.classList.contains('active') && !emojiPickerContainer.contains(e.target)) {
+    emojiPickerContainer.classList.remove('active');
+  }
+});
 
 // Initialize App
 fetchUsers();

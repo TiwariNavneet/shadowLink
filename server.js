@@ -46,11 +46,11 @@ webpush.setVapidDetails(
 // Predefined 9 secret codename users mapped to real names
 const users = [
   { id: 'u1', name: 'Raven', realName: 'Deepak Nautiyal', avatarColor: 'linear-gradient(135deg, #FF6B6B, #FF8E53)' },
-  { id: 'u2', name: 'Cipher', realName: 'Ayush Sharma', avatarColor: 'linear-gradient(135deg, #F3A683, #F19066)' },
+  { id: 'u2', name: 'Python', realName: 'Ayush Sharma', avatarColor: 'linear-gradient(135deg, #F3A683, #F19066)' },
   { id: 'u3', name: 'Falcon', realName: 'Vipul Tiwari', avatarColor: 'linear-gradient(135deg, #4834D4, #686DE0)' },
   { id: 'u4', name: 'Orion', realName: 'Sanjay Upadhaye', avatarColor: 'linear-gradient(135deg, #1DD1A1, #10AC84)' },
   { id: 'u5', name: 'Shadow', realName: 'Navneet Tiwari', avatarColor: 'linear-gradient(135deg, #FF9F43, #FFB142)' },
-  { id: 'u6', name: 'Viper', realName: 'Amit Chahar', avatarColor: 'linear-gradient(135deg, #0984E3, #74B9FF)' },
+  { id: 'u6', name: 'Cipher', realName: 'Amit Chahar', avatarColor: 'linear-gradient(135deg, #0984E3, #74B9FF)' },
   { id: 'u7', name: 'Phoenix', realName: 'Tattvam Shiva Chaturvedi', avatarColor: 'linear-gradient(135deg, #2C3E50, #34495E)' },
   { id: 'u8', name: 'Ghost', realName: 'Prakhar Kumar Singh', avatarColor: 'linear-gradient(135deg, #E84393, #FD79A8)' },
   { id: 'u9', name: 'Wolf', realName: 'Manas Maurya', avatarColor: 'linear-gradient(135deg, #6C5CE7, #A29BFE)' }
@@ -143,7 +143,7 @@ io.on('connection', (socket) => {
       socket.emit('error-msg', 'Invalid User ID');
       return;
     }
-    
+
     currentUserId = userId;
     if (!userSockets.has(userId)) {
       userSockets.set(userId, new Set());
@@ -161,7 +161,7 @@ io.on('connection', (socket) => {
         }
         return msg;
       });
-    
+
     socket.emit('message-history', userMessages);
   });
 
@@ -180,6 +180,7 @@ io.on('connection', (socket) => {
       from: currentUserId,
       to,
       text: text.trim(),
+      type: data.type || 'text',
       timestamp: Date.now(),
       status: 'unopened',
       openTimer: 10,
@@ -255,7 +256,7 @@ io.on('connection', (socket) => {
     setTimeout(() => {
       msg.status = 'destroyed';
       msg.text = '• Message self-destructed •';
-      
+
       notifyUsers.forEach(uId => {
         const sids = userSockets.get(uId);
         if (sids) {

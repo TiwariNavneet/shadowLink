@@ -103,10 +103,23 @@
               <!-- Dynamically populated messages -->
             </div>
 
+            <!-- Emojis & Stickers Picker Container -->
+            <div id="emoji-picker-container" class="emoji-picker-container">
+              <div class="picker-tabs">
+                <button type="button" id="tab-emojis" class="tab-btn active">Emojis</button>
+                <button type="button" id="tab-stickers" class="tab-btn">Stickers</button>
+              </div>
+              <div id="emoji-grid" class="picker-grid active"></div>
+              <div id="sticker-grid" class="picker-grid"></div>
+            </div>
+
             <!-- Input area -->
             <div class="chat-input-container">
               <form id="message-form" class="message-form">
                 <div class="input-wrapper">
+                  <button type="button" id="emoji-btn" class="emoji-btn">
+                    <i class="fa-regular fa-face-smile"></i>
+                  </button>
                   <input type="text" id="message-input" autocomplete="off"
                     placeholder="Type a message... (max 160 characters)" maxlength="160">
                   <span id="char-counter">160</span>

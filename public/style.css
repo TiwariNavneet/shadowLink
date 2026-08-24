@@ -1088,4 +1088,143 @@ input, textarea {
   user-select: text !important;
 }
 
+/* ==================== EMOJIS & STICKERS PICKER ==================== */
+.emoji-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+
+.emoji-btn:hover {
+  color: var(--accent-color);
+  transform: scale(1.15);
+}
+
+.emoji-picker-container {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  width: 320px;
+  height: 300px;
+  background: rgba(10, 14, 23, 0.95);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  backdrop-filter: blur(15px);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.emoji-picker-container.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.picker-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  padding: 10px;
+  gap: 10px;
+}
+
+.tab-btn {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: 8px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.picker-grid {
+  display: none;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  padding: 12px;
+  overflow-y: auto;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
+}
+
+.picker-grid.active {
+  display: grid;
+}
+
+.emoji-item {
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.emoji-item:hover {
+  transform: scale(1.25);
+}
+
+.sticker-item {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  padding: 5px;
+}
+
+.sticker-item:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sticker-img {
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  border-radius: 12px;
+  animation: popIn 0.3s ease;
+}
+
+/* Clear transparent backgrounds for message bubbles with stickers */
+.message-bubble-wrapper.received .message-bubble.sticker-bubble,
+.message-bubble-wrapper.sent .message-bubble.sticker-bubble {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 
