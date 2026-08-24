@@ -50,7 +50,7 @@ const users = [
   { id: 'u3', name: 'Falcon', realName: 'Vipul Tiwari', avatarColor: 'linear-gradient(135deg, #4834D4, #686DE0)' },
   { id: 'u4', name: 'Orion', realName: 'Sanjay Upadhaye', avatarColor: 'linear-gradient(135deg, #1DD1A1, #10AC84)' },
   { id: 'u5', name: 'Shadow', realName: 'Navneet Tiwari', avatarColor: 'linear-gradient(135deg, #FF9F43, #FFB142)' },
-  { id: 'u6', name: 'Cipher', realName: 'Amit Chahar', avatarColor: 'linear-gradient(135deg, #0984E3, #74B9FF)' },
+  { id: 'u6', name: 'Alpha', realName: 'Amit Chahar', avatarColor: 'linear-gradient(135deg, #0984E3, #74B9FF)' },
   { id: 'u7', name: 'Phoenix', realName: 'Tattvam Shiva Chaturvedi', avatarColor: 'linear-gradient(135deg, #2C3E50, #34495E)' },
   { id: 'u8', name: 'Ghost', realName: 'Prakhar Kumar Singh', avatarColor: 'linear-gradient(135deg, #E84393, #FD79A8)' },
   { id: 'u9', name: 'Wolf', realName: 'Manas Maurya', avatarColor: 'linear-gradient(135deg, #6C5CE7, #A29BFE)' }
@@ -264,25 +264,47 @@ io.on('connection', (socket) => {
       }
     });
 
-    // Set server-side countdown trigger to destroy message
+    // Safety cleanup timeout: if the client disconnects or fails, destroy after 60 seconds anyway
     setTimeout(() => {
-      msg.status = 'destroyed';
-      msg.text = '• Message self-destructed •';
-
-      notifyUsers.forEach(uId => {
-        const sids = userSockets.get(uId);
-        if (sids) {
-          sids.forEach(sid => {
-            io.to(sid).emit('message-updated', {
-              id: msg.id,
-              status: msg.status,
-              text: msg.text,
-              expiresAt: msg.expiresAt
+      if (msg.status !== 'destroyed') {
+        msg.status = 'destroyed';
+        msg.text = '• Message self-destructed •';
+        notifyUsers.forEach(uId => {
+          const sids = userSockets.get(uId);
+          if (sids) {
+            sids.forEach(sid => {
+              io.to(sid).emit('message-updated', {
+                id: msg.id,
+                status: msg.status,
+                text: msg.text
+              });
             });
+          }
+        });
+      }
+    }, 60 * 1000); // 60-second safety fallback window
+  });
+
+  socket.on('destroy-message', (messageId) => {
+    const msg = messages.find(m => m.id === messageId);
+    if (!msg || msg.status === 'destroyed') return;
+
+    msg.status = 'destroyed';
+    msg.text = '• Message self-destructed •';
+
+    const notifyUsers = [msg.from, msg.to];
+    notifyUsers.forEach(uId => {
+      const sids = userSockets.get(uId);
+      if (sids) {
+        sids.forEach(sid => {
+          io.to(sid).emit('message-updated', {
+            id: msg.id,
+            status: msg.status,
+            text: msg.text
           });
-        }
-      });
-    }, msg.openTimer * 1000);
+        });
+      }
+    });
   });
 
   socket.on('disconnect', () => {

@@ -11,7 +11,7 @@ const staticUsers = [
   { id: 'u3', name: 'Falcon', realName: 'Vipul Tiwari', avatarColor: 'linear-gradient(135deg, #4834D4, #686DE0)' },
   { id: 'u4', name: 'Orion', realName: 'Sanjay Upadhaye', avatarColor: 'linear-gradient(135deg, #1DD1A1, #10AC84)' },
   { id: 'u5', name: 'Shadow', realName: 'Navneet Tiwari', avatarColor: 'linear-gradient(135deg, #FF9F43, #FFB142)' },
-  { id: 'u6', name: 'Cipher', realName: 'Amit Chahar', avatarColor: 'linear-gradient(135deg, #0984E3, #74B9FF)' },
+  { id: 'u6', name: 'Alpha', realName: 'Amit Chahar', avatarColor: 'linear-gradient(135deg, #0984E3, #74B9FF)' },
   { id: 'u7', name: 'Phoenix', realName: 'Tattvam Shiva Chaturvedi', avatarColor: 'linear-gradient(135deg, #2C3E50, #34495E)' },
   { id: 'u8', name: 'Ghost', realName: 'Prakhar Kumar Singh', avatarColor: 'linear-gradient(135deg, #E84393, #FD79A8)' },
   { id: 'u9', name: 'Wolf', realName: 'Manas Maurya', avatarColor: 'linear-gradient(135deg, #6C5CE7, #A29BFE)' }
@@ -524,35 +524,17 @@ function showSnapViewer(msg) {
   snapTextContent.textContent = "👆 Press and HOLD here to view";
   snapViewerOverlay.classList.add('active');
 
-  const duration = msg.openTimer;
-  
-  if (activeCountdownInterval) clearInterval(activeCountdownInterval);
-  
-  const totalOffset = 94;
-  
-  function updateTimer() {
-    const msRemaining = msg.expiresAt - Date.now();
-    const secRemaining = Math.max(0, Math.ceil(msRemaining / 1000));
-    
-    countdownNumber.textContent = secRemaining;
-
-    const percentage = Math.max(0, msRemaining / (duration * 1000));
-    const offset = totalOffset - (percentage * totalOffset);
-    countdownProgress.style.strokeDashoffset = offset;
-
-    if (msRemaining <= 0) {
-      clearInterval(activeCountdownInterval);
-      closeSnapViewer();
-    }
-  }
-
-  updateTimer();
-  activeCountdownInterval = setInterval(updateTimer, 100);
+  // Set initial countdown values without running intervals
+  activeMessageRemainingMs = msg.openTimer * 1000;
+  isActivelyHolding = false;
+  countdownNumber.textContent = msg.openTimer;
+  countdownProgress.style.strokeDashoffset = 0;
 }
 
 function closeSnapViewer() {
   snapViewerOverlay.classList.remove('active');
   activeMessageBeingViewed = null;
+  isActivelyHolding = false;
   snapTextContent.textContent = "Loading message...";
   if (activeCountdownInterval) {
     clearInterval(activeCountdownInterval);
@@ -565,6 +547,7 @@ const snapContentBody = document.querySelector('.snap-content-body');
 
 const revealMessage = () => {
   if (activeMessageBeingViewed) {
+    isActivelyHolding = true;
     if (activeMessageBeingViewed.type === 'sticker') {
       if (activeMessageBeingViewed.text.endsWith('.mp4')) {
         snapTextContent.innerHTML = `<video src="${activeMessageBeingViewed.text}" class="sticker-video" autoplay loop muted playsinline></video>`;
@@ -575,13 +558,58 @@ const revealMessage = () => {
       snapTextContent.textContent = activeMessageBeingViewed.text;
     }
     snapTextContent.style.filter = 'none';
+
+    // Start or resume countdown interval
+    if (!activeCountdownInterval) {
+      const tickMs = 100;
+      activeCountdownInterval = setInterval(() => {
+        if (isActivelyHolding && activeMessageRemainingMs > 0) {
+          activeMessageRemainingMs -= tickMs;
+          const secRemaining = Math.max(0, Math.ceil(activeMessageRemainingMs / 1000));
+          countdownNumber.textContent = secRemaining;
+
+          const percentage = Math.max(0, activeMessageRemainingMs / (activeMessageBeingViewed.openTimer * 1000));
+          const offset = 94 - (percentage * 94);
+          countdownProgress.style.strokeDashoffset = offset;
+
+          if (activeMessageRemainingMs <= 0) {
+            clearInterval(activeCountdownInterval);
+            activeCountdownInterval = null;
+            
+            // Destroy message
+            if (!isOfflineMode && socket) {
+              socket.emit('destroy-message', activeMessageBeingViewed.id);
+            } else {
+              const msgId = activeMessageBeingViewed.id;
+              const msg = messageHistory.find(m => m.id === msgId);
+              if (msg) {
+                msg.status = 'destroyed';
+                msg.text = '• Message self-destructed •';
+                saveOfflineHistory();
+                playSound('destroy');
+                renderContacts();
+                renderMessages();
+              }
+              closeSnapViewer();
+            }
+          }
+        }
+      }, tickMs);
+    }
   }
 };
 
 const hideMessage = () => {
   if (activeMessageBeingViewed) {
+    isActivelyHolding = false;
     snapTextContent.textContent = "👆 Press and HOLD here to view";
     snapTextContent.style.filter = 'blur(4px)';
+
+    // Pause countdown
+    if (activeCountdownInterval) {
+      clearInterval(activeCountdownInterval);
+      activeCountdownInterval = null;
+    }
   }
 };
 
