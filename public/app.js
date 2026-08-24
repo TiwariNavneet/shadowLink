@@ -45,6 +45,8 @@ let activeRecipientId = null;
 let messageHistory = [];
 let activeCountdownInterval = null;
 let activeMessageBeingViewed = null; // Track message currently in viewer modal
+let activeMessageRemainingMs = 0;    // Remaining milliseconds of active message view time
+let isActivelyHolding = false;       // Track user hold action state
 
 // DOM Elements
 const loginScreen = document.getElementById('login-screen');
@@ -492,23 +494,10 @@ window.openSnap = function(messageId) {
     const msg = messageHistory.find(m => m.id === messageId);
     if (msg && msg.status === 'unopened') {
       msg.status = 'opened';
-      msg.expiresAt = Date.now() + (msg.openTimer * 1000);
       saveOfflineHistory();
       renderContacts();
       renderMessages();
       showSnapViewer(msg);
-
-      setTimeout(() => {
-        msg.status = 'destroyed';
-        msg.text = '• Message self-destructed •';
-        saveOfflineHistory();
-        playSound('destroy');
-        renderContacts();
-        renderMessages();
-        if (snapViewerOverlay.classList.contains('active')) {
-          closeSnapViewer();
-        }
-      }, msg.openTimer * 1000);
     }
   }
 };
