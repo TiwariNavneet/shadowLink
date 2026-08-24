@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShadowLink Project Overview & Technical Architecture</title>
+  <!-- Outfit & Inter Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-color: #050811;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --border-color: rgba(255, 255, 255, 0.07);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-color: #fffc00;
+      --accent-glow: rgba(255, 252, 0, 0.2);
+      --accent-blue: #38bdf8;
+      --accent-green: #4ade80;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Glow overlays */
+    .glow-1 {
+      position: absolute;
+      top: -100px;
+      left: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .glow-2 {
+      position: absolute;
+      bottom: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 80px;
+      height: 80px;
+      background-color: var(--accent-color);
+      color: #000;
+      font-size: 2.5rem;
+      border-radius: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 30px var(--accent-glow);
+      transform: rotate(-10deg);
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #fff 40%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.2rem;
+      font-weight: 300;
+    }
+
+    section {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 35px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 10px;
+    }
+
+    h2 i {
+      color: var(--accent-color);
+    }
+
+    p {
+      color: var(--text-secondary);
+      margin-bottom: 15px;
+      font-size: 1.05rem;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .tech-card {
+      background: rgba(255, 255, 255, 0.015);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .tech-card:hover {
+      border-color: var(--border-color);
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tech-card h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tech-card h3 i {
+      font-size: 1rem;
+    }
+
+    .tech-card p {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    ul {
+      list-style-type: none;
+    }
+
+    .concept-list li {
+      margin-bottom: 25px;
+      padding-left: 15px;
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .concept-list li h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.3rem;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .demo-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .step-number {
+      background: var(--accent-color);
+      color: #000;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent-color);
+      color: #000;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      margin-bottom: 30px;
+    }
+
+    .nav-btn:hover {
+      box-shadow: 0 0 20px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .color-blue { h3 i { color: var(--accent-blue); } }
+    .color-green { h3 i { color: var(--accent-green); } }
+    .color-yellow { h3 i { color: var(--accent-color); } }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 20px 10px;
+      }
+      h1 {
+        font-size: 2.2rem;
+      }
+      section {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="glow-1"></div>
+    <div class="glow-2"></div>
+
+    <a href="/index.html" class="nav-btn">
+      <i class="fa-solid fa-arrow-left"></i> Back to Messenger
+    </a>
+
+    <header>
+      <div class="logo-container">
+        <i class="fa-solid fa-ghost"></i>
+      </div>
+      <h1>ShadowLink Technical Overview</h1>
+      <p class="subtitle">A Comprehensive Presentation & Architecture Guide</p>
+    </header>
+
+    <!-- Project Overview -->
+    <section>
+      <h2><i class="fa-solid fa-circle-info"></i> Project Executive Summary</h2>
+      <p>
+        <strong>ShadowLink</strong> is a secure, real-time, disappearing-message web application optimized as a Progressive Web App (PWA) for mobile devices. It is built to facilitate instant, zero-trace communications among private teams.
+      </p>
+      <p>
+        Unlike standard messengers, ShadowLink treats privacy and data sanitation as hard code constraints. It hides real-world identity mappings behind secret codenames on the server, destroys message history dynamically from all memory registers exactly 10 seconds after a message is read, and restricts reading capabilities to mobile devices to secure visual boundaries.
+      </p>
+    </section>
+
+    <!-- Technologies Used -->
+    <section>
+      <h2><i class="fa-solid fa-cubes"></i> Technology Stack Details</h2>
+      <div class="tech-grid">
+        
+        <div class="tech-card color-blue">
+          <h3><i class="fa-solid fa-code"></i> Frontend UI Stack</h3>
+          <p>Built using <strong>HTML5</strong>, <strong>Vanilla CSS3</strong> (with dark-mode glassmorphic styling), and <strong>Vanilla ES6 Javascript</strong>. The interface uses customized responsive layouts to adapt instantly to different screen sizes without heavy UI frameworks.</p>
+        </div>
+
+        <div class="tech-card color-green">
+          <h3><i class="fa-solid fa-gears"></i> Real-time Server Stack</h3>
+          <p>Uses a <strong>Node.js</strong> and <strong>Express</strong> backend server coupled with <strong>Socket.io</strong>. This framework establishes immediate, bidirectional persistent TCP connections to coordinate registrations, online states, and messages instantly.</p>
+        </div>
+
+        <div class="tech-card color-yellow">
+          <h3><i class="fa-solid fa-paper-plane"></i> Web Push Notification API</h3>
+          <p>Powered by the <strong>Web-Push Protocol (VAPID)</strong>. The server connects directly to Google FCM / Apple APNS push gateways to wake up mobile browser service workers and render notification banners even when the device is locked or the app is closed.</p>
+        </div>
+
+        <div class="tech-card color-blue">
+          <h3><i class="fa-solid fa-server"></i> Storage Sandbox</h3>
+          <p>A JSON database (<strong>db.json</strong>) handles persistent user PIN allocations and Web Push device subscription keys. Client-side caching utilizes encrypted <strong>LocalStorage</strong>, strictly sandboxed to individual users to prevent cross-user device snooping.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Core Security Concepts -->
+    <section>
+      <h2><i class="fa-solid fa-shield-halved"></i> Key Technical Concepts & Design Patterns</h2>
+      <ul class="concept-list">
+        
+        <li>
+          <h3>Identity Abstraction Model</h3>
+          <p>Real-world user mappings are locked inside server-side configuration memory. The client application only displays and operates on secret codenames (e.g. <i>Shadow, Orion, Ghost</i>). There is no mechanism for standard clients to fetch another user's true identity from the API.</p>
+        </li>
+
+        <li>
+          <h3>Double-Gated Self-Destruct Lifecycle</h3>
+          <p>Messages exist in an "Unopened" state. Opening triggers a client-side ticking circle animation countdown (Web Audio pop/sweep alerts) and alerts the backend server. The server schedules an immediate 10-second timer, sweeping the message text in RAM and replacing it with <i>"• Message self-destructed •"</i>. This guarantees no trace remains in RAM or file registers.</p>
+        </li>
+
+        <li>
+          <h3>Dynamic Push & Foreground Filtering</h3>
+          <p>Because mobile OS kernels close WebSocket streams when backgrounded, the server immediately triggers a Web Push notification for incoming messages. The mobile PWA's <strong>Service Worker</strong> receives the push event and dynamically detects window status. If the app is active in the foreground, it suppresses the push banner (to avoid duplicates); if backgrounded, it fires the alert immediately.</p>
+        </li>
+
+        <li>
+          <h3>Hardware & Inspector Hardening</h3>
+          <p>
+            The app prevents snooping and screenshot captures using three layers:
+            <br>• <strong>Hold-To-View</strong>: Users must actively press and hold their finger on the message block to reveal text. Lifting the finger or attempting a screenshot gesture disrupts the touch input, immediately hiding the text.
+            <br>• <strong>DevTools Blocker</strong>: Disables right-clicks (Context Menu) and captures key combinations for developer inspectors (F12, Cmd+Opt+I, Ctrl+Shift+I). An ongoing loop measures window dimension alterations and debugger delays, blocking the DOM if developer options are opened.
+            <br>• <strong>Blur Overlay & CSS Print Blocks</strong>: Blurs the application body dynamically on focus loss (iOS/Android application switcher views) and uses CSS <code>@media print</code> to completely blank out the screen during print or screen capture commands.
+          </p>
+        </li>
+
+      </ul>
+    </section>
+
+    <!-- Presentation / Demo Flow -->
+    <section>
+      <h2><i class="fa-solid fa-chalkboard-user"></i> How to Demo / Explain This Project</h2>
+      <p style="margin-bottom: 20px;">Use the following sequence to showcase the system to examiners or clients:</p>
+      <div class="demo-steps">
+        
+        <div class="step-item">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Initial Verification Form</h3>
+            <p>Show the main login page. Explain that standard selection cards have been removed for safety. Enter your Codename (e.g., <code>Shadow</code>) and your 4-digit PIN. If it's a first-time login, explain how it asks to secure the account using that PIN.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Demonstrate Mobile Lock Constraints</h3>
+            <p>Open the app on a computer and try to open a message. Show that the web app alerts you that reading disappearing messages is restricted to mobile screens only for security. Open the same link on your phone (or resize the browser view) to proceed.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Showcase Hold-To-View & Self-Destruction</h3>
+            <p>Open a chat and send a message. Tap to open it on the receiver side. Hold your finger down on the card to read the text. Explain that lifting your finger instantly blurs and hides the content, protecting against physical screen grabs.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <h3>Verify Background Notification Delivery</h3>
+            <p>Close the app on the receiver's mobile phone (or turn off the phone screen). Send a message from the sender's device. Show that the receiver's phone screen wakes up, vibrates strongly, and shows the notification banner. Tap it to directly focus and load the chat window.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+</body>
+</html>
