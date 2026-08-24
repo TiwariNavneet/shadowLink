@@ -123,6 +123,18 @@ app.get('/api/vapid-public-key', (req, res) => {
   res.json({ publicKey: VAPID_KEYS.publicKey });
 });
 
+// Scan and list available loop video clips/gifs
+app.get('/api/gifs', (req, res) => {
+  const directoryPath = path.join(__dirname, 'public', 'gifs');
+  fs.readdir(directoryPath, (err, files) => {
+    if (err) {
+      return res.status(500).json({ error: "Unable to scan gifs directory" });
+    }
+    const gifFiles = files.filter(file => file.endsWith('.mp4') || file.endsWith('.gif') || file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg'));
+    res.json(gifFiles.map(file => `/gifs/${file}`));
+  });
+});
+
 // Save Web Push Subscription for a user
 app.post('/api/subscribe', (req, res) => {
   const { userId, subscription } = req.body;

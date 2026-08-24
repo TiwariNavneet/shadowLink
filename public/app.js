@@ -78,8 +78,10 @@ const emojiBtn = document.getElementById('emoji-btn');
 const emojiPickerContainer = document.getElementById('emoji-picker-container');
 const tabEmojis = document.getElementById('tab-emojis');
 const tabStickers = document.getElementById('tab-stickers');
+const tabGifs = document.getElementById('tab-gifs');
 const emojiGrid = document.getElementById('emoji-grid');
 const stickerGrid = document.getElementById('sticker-grid');
+const gifGrid = document.getElementById('gif-grid');
 
 // PIN Authentication DOM Elements
 const pinAuthOverlay = document.getElementById('pin-auth-overlay');
@@ -564,7 +566,11 @@ const snapContentBody = document.querySelector('.snap-content-body');
 const revealMessage = () => {
   if (activeMessageBeingViewed) {
     if (activeMessageBeingViewed.type === 'sticker') {
-      snapTextContent.innerHTML = `<img src="${activeMessageBeingViewed.text}" class="sticker-img">`;
+      if (activeMessageBeingViewed.text.endsWith('.mp4')) {
+        snapTextContent.innerHTML = `<video src="${activeMessageBeingViewed.text}" class="sticker-video" autoplay loop muted playsinline></video>`;
+      } else {
+        snapTextContent.innerHTML = `<img src="${activeMessageBeingViewed.text}" class="sticker-img">`;
+      }
     } else {
       snapTextContent.textContent = activeMessageBeingViewed.text;
     }
@@ -1058,17 +1064,60 @@ tabEmojis.addEventListener('click', (e) => {
   e.stopPropagation();
   tabEmojis.classList.add('active');
   tabStickers.classList.remove('active');
+  tabGifs.classList.remove('active');
   emojiGrid.classList.add('active');
   stickerGrid.classList.remove('active');
+  gifGrid.classList.remove('active');
 });
 
 tabStickers.addEventListener('click', (e) => {
   e.stopPropagation();
   tabStickers.classList.add('active');
   tabEmojis.classList.remove('active');
+  tabGifs.classList.remove('active');
   stickerGrid.classList.add('active');
   emojiGrid.classList.remove('active');
+  gifGrid.classList.remove('active');
 });
+
+tabGifs.addEventListener('click', (e) => {
+  e.stopPropagation();
+  tabGifs.classList.add('active');
+  tabEmojis.classList.remove('active');
+  tabStickers.classList.remove('active');
+  gifGrid.classList.add('active');
+  emojiGrid.classList.remove('active');
+  stickerGrid.classList.remove('active');
+});
+
+// Fetch and Initialize GIFs Grid from Backend
+async function initGifsGrid() {
+  try {
+    const response = await fetch(`${BACKEND_URL}/api/gifs`);
+    if (!response.ok) throw new Error('API error');
+    const gifFiles = await response.json();
+    
+    gifGrid.innerHTML = '';
+    gifFiles.forEach(gifPath => {
+      const fullUrl = gifPath.startsWith('http') ? gifPath : `${BACKEND_URL}${gifPath}`;
+      const video = document.createElement('video');
+      video.className = 'gif-item';
+      video.src = fullUrl;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+      
+      video.addEventListener('click', () => {
+        sendSticker(fullUrl);
+      });
+      gifGrid.appendChild(video);
+    });
+  } catch (err) {
+    console.error("Could not load GIFs grid:", err);
+    gifGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary); font-size: 0.85rem; padding: 20px;">GIFs/Memes unavailable offline</p>';
+  }
+}
 
 // Close picker when clicking outside of it
 document.addEventListener('click', (e) => {
@@ -1078,4 +1127,5 @@ document.addEventListener('click', (e) => {
 });
 
 // Initialize App
+initGifsGrid();
 fetchUsers();

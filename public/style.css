@@ -1203,14 +1203,29 @@ input, textarea {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.sticker-img {
-  width: 90px;
-  height: 90px;
+.sticker-img, .sticker-video {
+  width: 140px;
+  height: 140px;
   object-fit: contain;
   display: block;
   pointer-events: none;
   border-radius: 12px;
   animation: popIn 0.3s ease;
+}
+
+.gif-item {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  cursor: pointer;
+  object-fit: cover;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  padding: 2px;
+}
+
+.gif-item:hover {
+  transform: scale(1.15);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* Clear transparent backgrounds for message bubbles with stickers */
