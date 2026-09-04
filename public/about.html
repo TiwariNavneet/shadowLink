@@ -10,18 +10,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/png" href="icon.png">
+  <link rel="apple-touch-icon" href="icon.png">
   
   <style>
     :root {
-      --bg-color: #050811;
-      --card-bg: rgba(255, 255, 255, 0.03);
-      --border-color: rgba(255, 255, 255, 0.07);
+      --bg-color: #07060e;
+      --card-bg: rgba(22, 17, 34, 0.65);
+      --border-color: rgba(168, 85, 247, 0.15);
       --text-primary: #f8fafc;
-      --text-secondary: #94a3b8;
-      --accent-color: #fffc00;
-      --accent-glow: rgba(255, 252, 0, 0.2);
+      --text-secondary: #a1a1aa;
+      --accent-color: #8b5cf6;
+      --accent-glow: rgba(139, 92, 246, 0.35);
+      --accent-purple: #a855f7;
       --accent-blue: #38bdf8;
-      --accent-green: #4ade80;
+      --accent-green: #34d399;
     }
 
     * {
@@ -49,9 +52,9 @@
       position: absolute;
       top: -100px;
       left: -100px;
-      width: 300px;
-      height: 300px;
-      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
       pointer-events: none;
       z-index: -1;
     }
@@ -62,7 +65,7 @@
       right: -100px;
       width: 400px;
       height: 400px;
-      background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
       pointer-events: none;
       z-index: -1;
     }
@@ -76,15 +79,28 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 80px;
-      height: 80px;
-      background-color: var(--accent-color);
-      color: #000;
-      font-size: 2.5rem;
-      border-radius: 24px;
+      width: 96px;
+      height: 96px;
+      background: rgba(18, 14, 28, 0.85);
+      border: 2px solid rgba(168, 85, 247, 0.35);
+      border-radius: 28px;
       margin-bottom: 20px;
-      box-shadow: 0 0 30px var(--accent-glow);
-      transform: rotate(-10deg);
+      box-shadow: 0 0 35px var(--accent-glow);
+      padding: 6px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .logo-container:hover {
+      transform: scale(1.05);
+      border-color: rgba(168, 85, 247, 0.7);
+      box-shadow: 0 0 45px rgba(139, 92, 246, 0.55);
+    }
+
+    .brand-logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 20px;
     }
 
     h1 {
@@ -93,7 +109,7 @@
       font-weight: 800;
       letter-spacing: -0.5px;
       margin-bottom: 10px;
-      background: linear-gradient(135deg, #fff 40%, var(--text-secondary) 100%);
+      background: linear-gradient(135deg, #ffffff 35%, #c4b5fd 75%, #8b5cf6 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -110,8 +126,8 @@
       border-radius: 24px;
       padding: 35px;
       margin-bottom: 30px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.4);
     }
 
     h2 {
@@ -145,17 +161,18 @@
     }
 
     .tech-card {
-      background: rgba(255, 255, 255, 0.015);
-      border: 1px solid rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(168, 85, 247, 0.1);
       border-radius: 16px;
       padding: 20px;
       transition: all 0.3s ease;
     }
 
     .tech-card:hover {
-      border-color: var(--border-color);
+      border-color: rgba(168, 85, 247, 0.35);
       transform: translateY(-2px);
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(139, 92, 246, 0.05);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
     }
 
     .tech-card h3 {
@@ -183,7 +200,7 @@
     .concept-list li {
       margin-bottom: 25px;
       padding-left: 15px;
-      border-left: 3px solid var(--accent-blue);
+      border-left: 3px solid var(--accent-color);
     }
 
     .concept-list li h3 {
@@ -206,8 +223,8 @@
     }
 
     .step-number {
-      background: var(--accent-color);
-      color: #000;
+      background: linear-gradient(135deg, #8b5cf6, #6366f1);
+      color: #fff;
       font-family: 'Outfit', sans-serif;
       font-weight: 800;
       width: 32px;
@@ -217,6 +234,7 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 0 12px var(--accent-glow);
     }
 
     .step-content h3 {
@@ -234,23 +252,25 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      background: var(--accent-color);
-      color: #000;
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: #fff;
       padding: 12px 24px;
       border-radius: 12px;
       font-weight: 700;
       text-decoration: none;
       transition: all 0.3s ease;
       margin-bottom: 30px;
+      box-shadow: 0 4px 18px var(--accent-glow);
     }
 
     .nav-btn:hover {
-      box-shadow: 0 0 20px var(--accent-glow);
+      box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
       transform: translateY(-2px);
     }
 
     .color-blue { h3 i { color: var(--accent-blue); } }
     .color-green { h3 i { color: var(--accent-green); } }
+    .color-purple { h3 i { color: var(--accent-purple); } }
     .color-yellow { h3 i { color: var(--accent-color); } }
 
     @media (max-width: 768px) {
@@ -278,7 +298,7 @@
 
     <header>
       <div class="logo-container">
-        <i class="fa-solid fa-ghost"></i>
+        <img src="icon.png" alt="ShadowLink Logo" class="brand-logo-img">
       </div>
       <h1>ShadowLink Technical Overview</h1>
       <p class="subtitle">A Comprehensive Presentation & Architecture Guide</p>

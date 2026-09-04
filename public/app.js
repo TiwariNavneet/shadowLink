@@ -415,7 +415,7 @@ function renderMessages() {
       innerHTML = `
         <div class="message-bubble ${msg.type === 'sticker' ? 'sticker-bubble' : ''}">
           <div class="message-bubble-header">
-            <span><i class="fa-solid fa-ghost snap-icon"></i>${msg.type === 'sticker' ? 'Short Sticker' : 'Short Message'}</span>
+            <span><i class="fa-solid fa-user-secret snap-icon"></i>${msg.type === 'sticker' ? 'Short Sticker' : 'Short Message'}</span>
           </div>
           <div class="snap-status-text">
             ${getStatusIcon(msg.status)}
@@ -868,9 +868,9 @@ function showLocalNotification(msg) {
       
       const options = {
         body: "You received a new disappearing message",
-        icon: "https://img.icons8.com/color/192/000000/ghost.png",
+        icon: "/icon.png",
         tag: msg.id,
-        badge: "https://img.icons8.com/color/96/000000/ghost.png",
+        badge: "/icon.png",
         vibrate: [1000, 200, 1000, 200, 1000], // Heavy vibration pattern (1s vibration, 0.2s pause)
         requireInteraction: true, // Keep notification active to wake screen
         renotify: true, // Force sound/vibe on new messages

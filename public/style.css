@@ -1,18 +1,26 @@
 :root {
-  --bg-dark: #0a0e17;
-  --panel-bg: rgba(25, 32, 50, 0.65);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --text-primary: #f3f4f6;
-  --text-secondary: #9ca3af;
+  --bg-dark: #07060e;
+  --bg-darker: #040308;
+  --panel-bg: rgba(18, 14, 28, 0.72);
+  --panel-bg-card: rgba(26, 20, 42, 0.65);
+  --border-color: rgba(168, 85, 247, 0.14);
+  --border-highlight: rgba(192, 132, 252, 0.35);
+  --text-primary: #f8fafc;
+  --text-secondary: #a1a1aa;
   
-  --accent-color: #fffc00; /* Snapchat Yellow */
-  --accent-glow: rgba(255, 252, 0, 0.25);
-  --accent-blue: #0abde3;
-  --accent-red: #ff7675;
-  --accent-green: #1dd1a1;
+  --accent-color: #8b5cf6; /* Electric Violet / Cyber Shadow */
+  --accent-glow: rgba(139, 92, 246, 0.35);
+  --accent-purple: #9333ea;
+  --accent-violet: #7c3aed;
+  --accent-indigo: #6366f1;
+  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6366f1 100%);
+  --accent-glow-strong: rgba(168, 85, 247, 0.6);
+  --accent-blue: #38bdf8;
+  --accent-red: #f43f5e;
+  --accent-green: #10b981;
   
   --glass-blur: blur(20px);
-  --shadow-lg: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -42,18 +50,18 @@ body {
   border-radius: 50%;
   filter: blur(150px);
   z-index: -1;
-  opacity: 0.15;
+  opacity: 0.18;
   pointer-events: none; /* Prevent blocking touch/scroll events */
 }
 
 .bg-glow-1 {
-  background: radial-gradient(circle, var(--accent-blue) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.4) 0%, transparent 70%);
   top: -10%;
   left: -10%;
 }
 
 .bg-glow-2 {
-  background: radial-gradient(circle, var(--accent-color) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
   bottom: -10%;
   right: -10%;
 }
@@ -118,11 +126,39 @@ body {
   margin-bottom: 35px;
 }
 
+.logo-wrapper {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto 18px auto;
+  border-radius: 26px;
+  background: rgba(18, 14, 28, 0.85);
+  border: 2px solid rgba(168, 85, 247, 0.35);
+  box-shadow: 0 0 35px var(--accent-glow);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition-smooth);
+}
+
+.logo-wrapper:hover {
+  transform: scale(1.06);
+  border-color: rgba(168, 85, 247, 0.7);
+  box-shadow: 0 0 45px rgba(139, 92, 246, 0.55);
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 20px;
+}
+
 .logo-icon {
   width: 70px;
   height: 70px;
-  background-color: var(--accent-color);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   border-radius: 20px;
   display: flex;
   justify-content: center;
@@ -144,7 +180,7 @@ body {
   font-weight: 800;
   margin-bottom: 8px;
   letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #fff 30%, var(--text-secondary) 100%);
+  background: linear-gradient(135deg, #ffffff 35%, #c4b5fd 75%, #8b5cf6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -175,14 +211,14 @@ body {
 }
 
 .login-form .input-wrapper input:focus {
-  border-color: rgba(255, 252, 0, 0.5);
-  box-shadow: 0 0 15px var(--accent-glow);
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.3);
 }
 
 .login-submit-btn {
-  background: var(--accent-color);
+  background: var(--accent-gradient);
   border: none;
-  color: #000;
+  color: #fff;
   padding: 16px;
   border-radius: 16px;
   font-size: 1.05rem;
@@ -190,10 +226,11 @@ body {
   cursor: pointer;
   transition: var(--transition-smooth);
   width: 100%;
+  box-shadow: 0 4px 20px rgba(139, 92, 246, 0.35);
 }
 
 .login-submit-btn:hover {
-  box-shadow: 0 0 20px var(--accent-glow);
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
   transform: translateY(-2px);
 }
 
@@ -343,8 +380,8 @@ body {
 }
 
 .contact-card.active {
-  background: rgba(255, 252, 0, 0.06);
-  border-color: rgba(255, 252, 0, 0.15);
+  background: rgba(139, 92, 246, 0.12);
+  border-color: rgba(168, 85, 247, 0.35);
 }
 
 .contact-card.active .contact-meta h4 {
@@ -385,18 +422,19 @@ body {
 
 .status-indicator.online {
   background-color: var(--accent-green);
-  box-shadow: 0 0 10px rgba(29, 209, 161, 0.5);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
 }
 
 /* Chat indicators */
 .unread-badge {
-  background-color: var(--accent-color);
-  color: #000;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  color: #fff;
   font-size: 0.7rem;
   font-weight: 700;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 20px;
   margin-left: 8px;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
   animation: pulse 1.5s infinite;
 }
 
@@ -534,8 +572,8 @@ body {
 }
 
 .message-bubble-wrapper.received .message-bubble {
-  background-color: rgba(255, 252, 0, 0.08);
-  border: 1px solid rgba(255, 252, 0, 0.15);
+  background-color: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(168, 85, 247, 0.2);
   border-bottom-left-radius: 4px;
 }
 
@@ -549,7 +587,7 @@ body {
 }
 
 .message-bubble-wrapper.received .message-bubble-header {
-  color: var(--accent-color);
+  color: #c4b5fd;
 }
 
 .snap-icon {
@@ -557,11 +595,11 @@ body {
 }
 
 .snap-action-btn {
-  background: var(--accent-color);
+  background: var(--accent-gradient);
   border: none;
-  color: #000;
+  color: #fff;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 6px 14px;
   border-radius: 8px;
   font-size: 0.8rem;
   cursor: pointer;
@@ -570,11 +608,12 @@ body {
   gap: 6px;
   margin-top: 6px;
   transition: var(--transition-smooth);
+  box-shadow: 0 2px 10px rgba(139, 92, 246, 0.35);
 }
 
 .snap-action-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 15px rgba(255, 252, 0, 0.4);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.55);
 }
 
 .snap-action-btn:active {
@@ -643,9 +682,9 @@ body {
 }
 
 .input-wrapper input:focus {
-  border-color: rgba(255, 252, 0, 0.4);
+  border-color: rgba(168, 85, 247, 0.5);
   background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 0 15px rgba(255, 252, 0, 0.05);
+  box-shadow: 0 0 16px rgba(139, 92, 246, 0.25);
 }
 
 #char-counter {
@@ -657,23 +696,24 @@ body {
 }
 
 .send-btn {
-  background: var(--accent-color);
+  background: var(--accent-gradient);
   border: none;
   width: 50px;
   height: 50px;
   border-radius: 16px;
-  color: #000;
+  color: #fff;
   font-size: 1.1rem;
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   transition: var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 .send-btn:hover:not(:disabled) {
   transform: scale(1.05);
-  box-shadow: 0 0 20px var(--accent-glow);
+  box-shadow: 0 0 22px rgba(139, 92, 246, 0.6);
 }
 
 .send-btn:disabled {
@@ -767,6 +807,7 @@ body {
   stroke-dasharray: 94; /* 2 * PI * r (15) */
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 0.1s linear;
+  filter: drop-shadow(0 0 6px rgba(139, 92, 246, 0.7));
 }
 
 #countdown-number {
@@ -822,12 +863,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(168, 85, 247, 0.2);
   border-radius: 20px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(168, 85, 247, 0.4);
 }
 
 /* Back button in Chat Header (Desktop) */
@@ -1008,8 +1049,8 @@ body {
 }
 
 #pin-input:focus {
-  border-color: rgba(255, 252, 0, 0.5);
-  box-shadow: 0 0 15px var(--accent-glow);
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
 }
 
 .pin-error-msg {
@@ -1044,18 +1085,19 @@ body {
 
 .pin-submit-btn {
   flex: 1.5;
-  background: var(--accent-color);
+  background: var(--accent-gradient);
   border: none;
-  color: #000;
+  color: #fff;
   padding: 14px;
   border-radius: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition-smooth);
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
 }
 
 .pin-submit-btn:hover:not(:disabled) {
-  box-shadow: 0 0 20px var(--accent-glow);
+  box-shadow: 0 0 22px rgba(139, 92, 246, 0.6);
 }
 
 .pin-submit-btn:disabled {

@@ -1,10 +1,11 @@
-const CACHE_NAME = 'shadowlink-v1';
+const CACHE_NAME = 'shadowlink-v2';
 const ASSETS = [
   '/',
   '/index.html',
   '/style.css',
   '/app.js',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon.png'
 ];
 
 // Install Event
@@ -44,8 +45,8 @@ self.addEventListener('push', (e) => {
     }
     const options = {
       body: data.body || "You received a new disappearing message",
-      icon: 'https://img.icons8.com/color/192/000000/ghost.png',
-      badge: 'https://img.icons8.com/color/96/000000/ghost.png',
+      icon: '/icon.png',
+      badge: '/icon.png',
       tag: data.tag || 'new-message',
       vibrate: [1000, 200, 1000, 200, 1000], // Heavy vibration pattern (1s vibration, 0.2s pause)
       sound: 'default', // Trigger default device sound to wake screen
